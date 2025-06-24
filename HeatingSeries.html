@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Joule’s Law: Heating Effect - Series Resistors</title>
+  <style>
+    body { background: #111; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+    #controls { margin: 20px; }
+    input[type=range] { width: 300px; }
+    canvas { background: #222; border: 2px solid #555; margin-top: 20px; }
+    label { font-size: 18px; }
+    #formula, #summary { margin-top: 10px; font-size: 18px; color: gold; }
+    .resistor-control { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Joule’s Law: Heating in Series Resistors</h1>
+  <div id="controls">
+    <label for="modeSelect">Mode:</label>
+    <select id="modeSelect">
+      <option value="voltage">Set Voltage (V)</option>
+      <option value="current">Set Current (I)</option>
+    </select><br><br>
+
+    <label for="valueSlider"><span id="modeLabel">Voltage (V)</span>: <span id="valueDisplay">10</span></label><br>
+    <input type="range" id="valueSlider" min="1" max="50" value="10">
+
+    <div class="resistor-control">
+      <label>R1: <span id="r1val">1</span>Ω</label><br>
+      <input type="range" id="r1slider" min="1" max="10" value="1">
+    </div>
+    <div class="resistor-control">
+      <label>R2: <span id="r2val">2</span>Ω</label><br>
+      <input type="range" id="r2slider" min="1" max="10" value="2">
+    </div>
+    <div class="resistor-control">
+      <label>R3: <span id="r3val">4</span>Ω</label><br>
+      <input type="range" id="r3slider" min="1" max="10" value="4">
+    </div>
+  </div>
+
+  <canvas id="heaterCanvas" width="700" height="300"></canvas>
+  <div id="formula">Heat ∝ I² × R × t, &nbsp;&nbsp; I = V / R<sub>total</sub></div>
+  <div id="summary"></div>
+
+  <script>
+    const canvas = document.getElementById('heaterCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const modeSelect = document.getElementById('modeSelect');
+    const valueSlider = document.getElementById('valueSlider');
+    const valueDisplay = document.getElementById('valueDisplay');
+    const modeLabel = document.getElementById('modeLabel');
+
+    const r1Slider = document.getElementById('r1slider');
+    const r2Slider = document.getElementById('r2slider');
+    const r3Slider = document.getElementById('r3slider');
+    const r1Val = document.getElementById('r1val');
+    const r2Val = document.getElementById('r2val');
+    const r3Val = document.getElementById('r3val');
+    const summary = document.getElementById('summary');
+
+    let mode = 'voltage';
+    let value = +valueSlider.value;
+
+    let resistors = [
+      { x: 100, y: 150, R: +r1Slider.value },
+      { x: 300, y: 150, R: +r2Slider.value },
+      { x: 500, y: 150, R: +r3Slider.value },
+    ];
+
+    modeSelect.addEventListener('change', () => {
+      mode = modeSelect.value;
+      modeLabel.textContent = mode === 'voltage' ? 'Voltage (V)' : 'Current (I)';
+      valueSlider.max = mode === 'voltage' ? 50 : 10;
+      valueSlider.value = 10;
+      value = +valueSlider.value;
+      valueDisplay.textContent = value;
+    });
+
+    valueSlider.addEventListener('input', () => {
+      value = +valueSlider.value;
+      valueDisplay.textContent = value;
+    });
+
+    r1Slider.addEventListener('input', () => {
+      resistors[0].R = +r1Slider.value;
+      r1Val.textContent = resistors[0].R;
+    });
+    r2Slider.addEventListener('input', () => {
+      resistors[1].R = +r2Slider.value;
+      r2Val.textContent = resistors[1].R;
+    });
+    r3Slider.addEventListener('input', () => {
+      resistors[2].R = +r3Slider.value;
+      r3Val.textContent = resistors[2].R;
+    });
+
+    function drawResistor(r, current) {
+      const heat = Math.min(255, current * current * r.R * 5);
+      let x = r.x;
+      ctx.lineWidth = 8;
+      ctx.strokeStyle = `rgb(${heat}, ${Math.floor(heat/4)}, 0)`;
+      ctx.beginPath();
+      ctx.moveTo(x, r.y);
+      for (let i = 0; i < 10; i++) {
+        const dx = 6, dy = (i % 2 === 0 ? -10 : 10);
+        ctx.lineTo(x + dx, r.y + dy);
+        x += dx;
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = `rgba(${heat}, ${Math.floor(heat/4)}, 0, 0.3)`;
+      ctx.beginPath();
+      ctx.arc(x - 30, r.y, 50, 0, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.fillStyle = '#fff';
+      ctx.font = '16px sans-serif';
+      ctx.fillText(`${r.R}Ω`, x - 30, r.y + 60);
+    }
+
+    function drawWirePath() {
+      ctx.strokeStyle = '#888'; ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(0, 150);
+      ctx.lineTo(70, 150);
+      ctx.moveTo(170, 150); ctx.lineTo(270, 150);
+      ctx.moveTo(370, 150); ctx.lineTo(470, 150);
+      ctx.moveTo(570, 150); ctx.lineTo(canvas.width, 150);
+      ctx.stroke();
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const R_total = resistors.reduce((sum, r) => sum + r.R, 0);
+      const current = mode === 'voltage' ? value / R_total : value;
+      const voltage = mode === 'voltage' ? value : value * R_total;
+
+      drawWirePath();
+      resistors.forEach(r => drawResistor(r, current));
+
+      const powers = resistors.map(r => (current * current * r.R).toFixed(2));
+      summary.innerHTML = `Total Resistance = ${R_total}Ω, Voltage = ${voltage.toFixed(2)}V, Current = ${current.toFixed(2)}A<br>
+        Power: R1 = ${powers[0]}W, R2 = ${powers[1]}W, R3 = ${powers[2]}W`;
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>

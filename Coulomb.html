@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Coulomb's Law Simulation</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    .container {
+      width: 80%;
+      margin: auto;
+    }
+    .charges {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 50px;
+      position: relative;
+      height: 100px;
+    }
+    .charge {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      position: absolute;
+      top: 0;
+    }
+    .q1 { background: red; }
+    .q2 { background: blue; }
+    .arrow {
+      display: none;
+    }
+    .dotted-line {
+      position: absolute;
+      top: 25px;
+      height: 0;
+      border-top: 2px dotted lime;
+      width: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: -1;
+    }
+    .simulate-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: gold;
+      color: black;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    input[type=range] {
+      width: 60%;
+    }
+    .charge.moving {
+      transition: transform 1s ease;
+    }
+    .output {
+      margin-top: 60px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Coulomb's Law Interactive Simulation</h1>
+  <div class="container">
+    <label>q1 (μC): <span id="q1Val">1</span></label><br>
+    <input type="range" id="q1" min="-10" max="10" value="1" step="0.1"><br>
+
+    <label>q2 (μC): <span id="q2Val">1</span></label><br>
+    <input type="range" id="q2" min="-10" max="10" value="1" step="0.1"><br>
+
+    <label>Distance (cm): <span id="rVal">5</span></label><br>
+    <input type="range" id="r" min="1" max="20" value="5" step="0.1"><br>
+
+    <button class="simulate-button" onclick="showInteraction()">Show Interaction</button>
+
+    <div class="charges">
+      <div class="charge q1" id="q1Box">+</div>
+      <div class="charge q2" id="q2Box">+</div>
+      <div class="dotted-line" id="dottedLine"></div>
+    </div>
+
+    <div class="output">
+      <p>Force F = <span id="forceVal">0</span> N</p>
+      <p id="direction"></p>
+    </div>
+  </div>
+
+  <script>
+    const k = 9e9;
+    const q1 = document.getElementById("q1");
+    const q2 = document.getElementById("q2");
+    const r = document.getElementById("r");
+    const q1Val = document.getElementById("q1Val");
+    const q2Val = document.getElementById("q2Val");
+    const rVal = document.getElementById("rVal");
+    const q1Box = document.getElementById("q1Box");
+    const q2Box = document.getElementById("q2Box");
+    const dottedLine = document.getElementById("dottedLine");
+    const forceVal = document.getElementById("forceVal");
+    const direction = document.getElementById("direction");
+
+    function update() {
+      const q1C = parseFloat(q1.value) * 1e-6;
+      const q2C = parseFloat(q2.value) * 1e-6;
+      const dist = parseFloat(r.value) / 100;
+
+      q1Val.textContent = q1.value;
+      q2Val.textContent = q2.value;
+      rVal.textContent = r.value;
+
+      const F = k * Math.abs(q1C * q2C) / (dist * dist);
+      forceVal.textContent = F.toFixed(4);
+
+      const isAttractive = q1C * q2C < 0;
+      direction.textContent = isAttractive ? "Attractive Force (→ ←)" : "Repulsive Force (← →)";
+
+      q1Box.textContent = parseFloat(q1.value) >= 0 ? '+' : '−';
+      q2Box.textContent = parseFloat(q2.value) >= 0 ? '+' : '−';
+
+      const minGap = 60;
+      const maxOffset = 200;
+      const rawOffset = (parseFloat(r.value) / 20) * maxOffset;
+      const offset = Math.max(minGap / 2, rawOffset);
+
+      q1Box.style.transform = `translateX(${-offset}px)`;
+      q2Box.style.transform = `translateX(${offset}px)`;
+
+      // Update dotted line length
+      dottedLine.style.width = `${2 * offset}px`;
+    }
+
+    function showInteraction() {
+      update();
+      const isAttractive = parseFloat(q1.value) * parseFloat(q2.value) < 0;
+
+      q1Box.classList.add("moving");
+      q2Box.classList.add("moving");
+
+      const shift = 40;
+      if (isAttractive) {
+        q1Box.style.transform += ` translateX(${shift}px)`;
+        q2Box.style.transform += ` translateX(${-shift}px)`;
+      } else {
+        q1Box.style.transform += ` translateX(${-shift}px)`;
+        q2Box.style.transform += ` translateX(${shift}px)`;
+      }
+
+      setTimeout(() => update(), 1000);
+    }
+
+    q1.oninput = q2.oninput = r.oninput = update;
+    update();
+  </script>
+</body>
+</html>

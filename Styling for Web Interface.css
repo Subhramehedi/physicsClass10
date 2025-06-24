@@ -1,0 +1,112 @@
+body {
+  margin: 0;
+  background: #000;
+  color: white;
+  font-family: sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar {
+  height: 60px;
+  background: #111;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 10px;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 2;
+}
+
+.sidebar button {
+  background: none;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 16px;
+  position: relative;
+}
+
+.sidebar button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.label {
+  display: inline-block;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(45deg, #4CAF50, #2196F3);
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: all 0.3s ease;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 0 6px rgba(0,0,0,0.4);
+  z-index: 999;
+}
+
+.sidebar button:hover .label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(5px);
+}
+
+iframe {
+  flex: 1;
+  border: none;
+  width: 100%;
+  height: calc(100vh - 60px);
+}
+
+.home-screen {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;
+}
+
+.home-screen h1 {
+  font-size: 3rem;
+  background: linear-gradient(45deg, #4CAF50, #2196F3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.home-screen p {
+  font-size: 1.5rem;
+  opacity: 0.8;
+  margin: 5px 0;
+  text-align: center;
+}
+
+.home-screen button {
+  margin-top: 30px;
+  background: #4CAF50;
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.home-screen button:hover {
+  background: #388E3C;
+}

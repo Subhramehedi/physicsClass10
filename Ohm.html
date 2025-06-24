@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ohm's Law - V-I Graph</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 20px;
+    }
+
+    canvas {
+      background: #222;
+      border: 2px solid #555;
+      margin-top: 20px;
+    }
+
+    #controls {
+      margin-top: 20px;
+    }
+
+    button, input {
+      padding: 10px 15px;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 5px;
+      border-radius: 6px;
+    }
+
+    button {
+      background: gold;
+      color: black;
+      border: none;
+      cursor: pointer;
+    }
+
+    #formula {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ohm's Law Simulation (V-I Graph)</h1>
+
+  <div id="controls">
+    <button onclick="increaseVoltage()">Increase Voltage</button>
+    <button onclick="resetGraph()">Reset</button>
+  </div>
+
+  <label for="resistanceInput">R (Ω):</label>
+  <input type="number" id="resistanceInput" value="2" min="0.1" step="0.1" style="width: 50px; font-size: 14px; padding: 5px;" onchange="updateResistance()">
+  <p id="resistanceLabel">Current Resistance: <strong>2 Ω</strong></p>
+
+  <canvas id="graph" width="700" height="400"></canvas>
+  <div id="formula">I = V / R = 0V / 2Ω = 0A</div>
+
+  <script>
+    const canvas = document.getElementById('graph');
+    const ctx = canvas.getContext('2d');
+    const resistanceInput = document.getElementById('resistanceInput');
+    const resistanceLabel = document.getElementById('resistanceLabel');
+
+    let voltage = 0;
+    let resistance = parseFloat(resistanceInput.value);
+    const points = [];
+
+    function drawAxes() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = '#888';
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      ctx.moveTo(50, 350);
+      ctx.lineTo(650, 350);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(50, 350);
+      ctx.lineTo(50, 50);
+      ctx.stroke();
+
+      ctx.fillStyle = 'white';
+      ctx.font = '16px sans-serif';
+      ctx.fillText("Voltage (V)", 500, 395);
+      ctx.fillText("Current (I)", 10, 30);
+
+      ctx.strokeStyle = '#333';
+      for (let i = 0; i <= 10; i++) {
+        const x = 50 + i * 60;
+        ctx.beginPath();
+        ctx.moveTo(x, 50);
+        ctx.lineTo(x, 350);
+        ctx.stroke();
+        if (i > 0) ctx.fillText(i + "V", x - 12, 370);
+      }
+
+      for (let i = 0; i <= 6; i++) {
+        const y = 350 - i * 50;
+        ctx.beginPath();
+        ctx.moveTo(50, y);
+        ctx.lineTo(650, y);
+        ctx.stroke();
+        if (i > 0) ctx.fillText(i + "A", 15, y + 5);
+      }
+    }
+
+    function plotPoint(v, i) {
+      const x = 50 + v * 60;
+      const y = 350 - i * 50;
+
+      ctx.fillStyle = 'gold';
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    function drawLine() {
+      if (points.length < 2) return;
+
+      ctx.strokeStyle = 'gold';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(50 + points[0].v * 60, 350 - points[0].i * 50);
+      for (let p of points) {
+        ctx.lineTo(50 + p.v * 60, 350 - p.i * 50);
+      }
+      ctx.stroke();
+    }
+
+    function increaseVoltage() {
+      if (voltage >= 10) return;
+
+      voltage += 1;
+      const current = voltage / resistance;
+      points.push({ v: voltage, i: current });
+
+      drawAxes();
+      drawLine();
+      for (let p of points) {
+        plotPoint(p.v, p.i);
+      }
+
+      document.getElementById("formula").textContent = 
+        `I = V / R = ${voltage}V / ${resistance}Ω = ${current.toFixed(2)}A`;
+    }
+
+    function resetGraph() {
+      voltage = 0;
+      points.length = 0;
+      drawAxes();
+      document.getElementById("formula").textContent = 
+        `I = V / R = 0V / ${resistance}Ω = 0A`;
+    }
+
+    function updateResistance() {
+      resistance = parseFloat(resistanceInput.value);
+      resistanceLabel.innerHTML = `Current Resistance: <strong>${resistance} Ω</strong>`;
+      resetGraph();
+    }
+
+    drawAxes();
+  </script>
+</body>
+</html>

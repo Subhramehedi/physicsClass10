@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বৈদ্যুতিক বিষয়ক মাইন্ড ম্যাপ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000000;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* Mindmap Styles */
+        .mindmap-container {
+            height: 100vh;
+            overflow: auto;
+            padding: 20px;
+            background: #000000;
+        }
+
+        .mindmap {
+            max-width: 35%;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .node {
+            margin: 10px 0;
+            user-select: none;
+        }
+
+        .node-content {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .node-content:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .node-content.expandable::before {
+            content: '▶';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s ease;
+            font-size: 0.8em;
+        }
+
+        .node-content.expandable.expanded::before {
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        .children {
+            margin-left: 30px;
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+            padding-left: 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .children.expanded {
+            max-height: 10000px;
+        }
+
+        .level-0 .node-content {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            border: none;
+        }
+
+        .level-1 .node-content {
+            background: linear-gradient(45deg, #4CAF50, #388E3C);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            border: none;
+        }
+
+        .level-2 .node-content {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: white;
+            border: none;
+        }
+
+        .level-3 .node-content {
+            background: linear-gradient(45deg, #9C27B0, #7B1FA2);
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+            border: none;
+        }
+
+        .level-4 .node-content {
+            background: linear-gradient(45deg, #E91E63, #C2185B);
+            font-size: 0.95rem;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <!-- Mindmap Page -->
+    <div class="mindmap-container">
+        <div class="mindmap" id="mindmap"></div>
+    </div>
+
+    <script>
+        const mindmapData = {
+            "চল তড়িৎ": {
+                "তড়িৎ প্রবাহ, বিভব পার্থক্য ও তড়িৎচালক বল": {
+                    "তড়িৎ আধান": {
+                        "প্রকার": {
+                            "ধনাত্মক আধান": {},
+                            "ঋণাত্মক আধান": {}
+                        },
+                        "বৈশিষ্ট্য": {
+                            "পারস্পরিক আকর্ষণ/বিকর্ষণ": {},
+                            "আধানের সংরক্ষণ": {},
+                            "আধানের কোয়ান্টায়ন": {}
+                        },
+                        "কুলম্বের সূত্র": {},
+                        "আধানের একক": {}
+                    },
+                    "তড়িৎ বিভব ও বিভব পার্থক্য": {
+                        "তড়িৎ বিভব (সংজ্ঞা)": {},
+                        "বিভব পার্থক্য (সংজ্ঞা)": {},
+                        "তড়িৎ বিভবের পরিমাপ": {},
+                        "কৃত কাজ": {},
+                        "একক": {},
+                        "মাত্রা": {},
+                        "বিভব পার্থক্যের ধারণা": {}
+                    },
+                    "তড়িৎচালক শক্তি ও তড়িৎ কোষ": {
+                        "তড়িৎচালক শক্তির সংজ্ঞা": {},
+                        "তড়িৎচালক শক্তি বনাম বিভব পার্থক্য": {},
+                        "তড়িৎচালক শক্তি দ্বারা কৃত কাজ": {},
+                        "তড়িৎচালক শক্তির একক": {},
+                        "তড়িৎচালক শক্তির গুরুত্ব": {},
+                        "কোষের প্রকার (তড়িৎচালক শক্তির উৎস)": {
+                            "প্রাথমিক কোষ": {},
+                            "মাধ্যমিক কোষ": {}
+                        }
+                    },
+                    "তড়িৎ প্রবাহ": {
+                        "সংজ্ঞা": {},
+                        "দিক": {},
+                        "প্রবাহের একক": {}
+                    }
+                },
+                "ওহমের সূত্র": {
+                    "বিবৃতি": {},
+                    "গাণিতিক রূপ": {},
+                    "রোধ": {
+                        "সংজ্ঞা": {},
+                        "রোধের একক": {},
+                        "রোধের মাত্রা": {},
+                        "V-I গ্রাফ": {},
+                        "ওহমের সূত্রের সীমাবদ্ধতা": {}
+                    }
+                },
+                "তড়িৎচালক শক্তি ও কোষের অভ্যন্তরীণ রোধ": {
+                    "অভ্যন্তরীণ রোধের সংজ্ঞা": {},
+                    "অভ্যন্তরীণ রোধকে প্রভাবিতকারী উপাদান": {},
+                    "সম্পর্ক: তড়িৎচালক শক্তি, প্রান্তিক ভোল্টেজ, অভ্যন্তরীণ রোধ": {},
+                    "হারানো ভোল্টের ধারণা": {}
+                },
+                "রোধাঙ্ক ও পরিবাহিতা": {
+                    "রোধকে প্রভাবিতকারী উপাদান": {},
+                    "রোধাঙ্কের সংজ্ঞা": {},
+                    "রোধাঙ্কের একক": {},
+                    "বিভিন্ন পদার্থের রোধাঙ্ক": {},
+                    "তড়িৎ পরিবাহিতা": {},
+                    "রোধের তাপমাত্রা সহগ": {}
+                },
+                "পরিবাহী ও অপরিবাহী": {
+                    "পরিবাহী": {
+                        "উদাহরণ": {},
+                        "রোধের পরিসর": {}
+                    },
+                    "অপরিবাহী": {
+                        "উদাহরণ": {},
+                        "রোধের পরিসর": {}
+                    },
+                    "অর্ধপরিবাহী": {
+                        "উদাহরণ": {},
+                        "রোধের পরিসর": {},
+                        "রোধ বনাম তাপমাত্রা গ্রাফ": {}
+                    }
+                },
+                "শ্রেণী ও সমান্তরাল সমবায়ে রোধক": {
+                    "শ্রেণী সমবায়": {},
+                    "সমান্তরাল সমবায়": {}
+                },
+                "তড়িৎ প্রবাহের তাপীয় ক্রিয়া (জুলের সূত্র)": {
+                    "কারণ": {},
+                    "জুলের সূত্র": {
+                        "প্রথম সূত্র": {},
+                        "দ্বিতীয় সূত্র": {},
+                        "তৃতীয় সূত্র": {},
+                        "গাণিতিক রূপ": {}
+                    },
+                    "গৃহস্থালী ব্যবহার": {
+                        "তড়িৎ হিটার": {},
+                        "তড়িৎ ইস্ত্রি": {},
+                        "তড়িৎ বাল্ব": {},
+                        "তড়িৎ ফিউজ": {}
+                    }
+                },
+                "তড়িৎ ক্ষমতা ও শক্তি (কিলোওয়াট-ঘন্টা, বিওটি)": {
+                    "তড়িৎ ক্ষমতার সংজ্ঞা": {},
+                    "সূত্র": {},
+                    "তড়িৎ ক্ষমতার একক": {},
+                    "কিলোওয়াট-ঘন্টা (বিওটি)": {},
+                    "শক্তি ব্যবহারের হিসাব": {}
+                },
+                "তড়িৎ যন্ত্রপাতির রেটিং": {
+                    "সংজ্ঞা": {},
+                    "গুরুত্ব": {},
+                    "প্রবাহ ও রোধের হিসাব": {}
+                },
+                "সিএফএল বনাম এলইডি বাল্ব": {
+                    "জনপ্রিয়তার কারণ": {},
+                    "এলইডির সুবিধা": {},
+                    "সিএফএলের অসুবিধা": {}
+                }
+            },
+            "তড়িৎ চুম্বকত্ব": {
+                "চুম্বকের উপর তড়িৎ প্রবাহের ক্রিয়া (ওয়ার্স্টেডের পরীক্ষা)": {
+                    "পরীক্ষার বর্ণনা": {},
+                    "সিদ্ধান্ত": {},
+                    "দিক নির্ণয়ের নিয়ম": {}
+                },
+                "তড়িৎ প্রবাহের কারণে চুম্বক ক্ষেত্র": {
+                    "সরল পরিবাহীর কারণে": {},
+                    "বৃত্তাকার কুণ্ডলীর কারণে": {},
+                    "সোলেনয়েডের কারণে": {}
+                },
+                "তড়িৎ প্রবাহের উপর চুম্বকের ক্রিয়া (ফ্লেমিংয়ের বাম হস্ত নিয়ম)": {
+                    "বিবৃতি": {},
+                    "মোটরের নীতি": {}
+                },
+                "বার্লোর চাকা": {
+                    "নীতি": {},
+                    "গঠন": {},
+                    "কার্যনীতি": {},
+                    "ঘূর্ণনের দিক": {}
+                },
+                "তড়িৎ মোটরের নীতি ও কার্যপ্রণালী": {
+                    "নীতি": {},
+                    "গঠন": {},
+                    "কার্যপ্রণালী": {},
+                    "মোটরের ক্ষমতা বৃদ্ধি": {},
+                    "ডিসি মোটরের ব্যবহার": {}
+                }
+            },
+            "তড়িৎ চুম্বকীয় আবেশ": {
+                "সংজ্ঞা": {},
+                "আবিষ্ট তড়িৎচালক শক্তি ও প্রবাহের ধারণা": {},
+                "পরীক্ষা (গ্যালভানোমিটার)": {},
+                "আবিষ্ট প্রবাহকে প্রভাবিতকারী উপাদান": {},
+                "ফ্যারাডের তড়িৎ চুম্বকীয় আবেশের সূত্র": {
+                    "প্রথম সূত্র": {},
+                    "দ্বিতীয় সূত্র": {}
+                },
+                "লেনজের সূত্র": {}
+            },
+            "সরল (ডিসি) ও পরিবর্তী (এসি) প্রবাহ": {
+                "ডিসি (স্থির প্রবাহ)": {},
+                "এসি (পরিবর্তনশীল প্রবাহ)": {},
+                "ডিসির তুলনায় এসির সুবিধা": {},
+                "এসি-ডিসি রূপান্তর": {}
+            },
+            "তড়িৎ জেনারেটর": {
+                "জেনারেটরের নীতি": {},
+                "ডিসি জেনারেটর": {
+                    "গঠন": {},
+                    "কার্যপ্রণালী": {}
+                },
+                "এসি জেনারেটর": {
+                    "গঠন": {},
+                    "কার্যপ্রণালী": {}
+                },
+                "ডায়নামো বনাম মোটর": {},
+                "বিদ্যুৎ উৎপাদন": {
+                    "তাপীয় বিদ্যুৎ উৎপাদন": {},
+                    "জলবিদ্যুৎ উৎপাদন": {}
+                }
+            },
+            "গৃহস্থালী তড়িৎ বর্তনীতে ব্যবহৃত উপাদান": {
+                "সুইচ": {},
+                "সকেট": {},
+                "পিন প্লাগ": {},
+                "লাইভ, নিউট্রাল, আর্থ তার": {},
+                "আর্থিং": {},
+                "প্রধান সুইচ ও মিটার": {},
+                "সার্কিট ব্রেকার (এমসিবি)": {}
+            }
+        };
+
+        function createNode(text, children, level) {
+            const node = document.createElement('div');
+            node.className = `node level-${level}`;
+            
+            const content = document.createElement('div');
+            content.className = 'node-content';
+            content.textContent = text;
+            
+            if (Object.keys(children).length > 0) {
+                content.classList.add('expandable');
+                content.addEventListener('click', function() {
+                    const childrenDiv = node.querySelector('.children');
+                    if (childrenDiv.classList.contains('expanded')) {
+                        childrenDiv.classList.remove('expanded');
+                        content.classList.remove('expanded');
+                    } else {
+                        childrenDiv.classList.add('expanded');
+                        content.classList.add('expanded');
+                    }
+                });
+            }
+            
+            node.appendChild(content);
+            
+            if (Object.keys(children).length > 0) {
+                const childrenDiv = document.createElement('div');
+                childrenDiv.className = 'children';
+                
+                for (const [childText, grandChildren] of Object.entries(children)) {
+                    const childNode = createNode(childText, grandChildren, level + 1);
+                    childrenDiv.appendChild(childNode);
+                }
+                
+                node.appendChild(childrenDiv);
+            }
+            
+            return node;
+        }
+
+        function buildMindmap() {
+            const mindmapDiv = document.getElementById('mindmap');
+            mindmapDiv.innerHTML = '';
+            
+            for (const [rootText, rootChildren] of Object.entries(mindmapData)) {
+                const rootNode = createNode(rootText, rootChildren, 0);
+                mindmapDiv.appendChild(rootNode);
+            }
+            
+        }
+
+        // Initialize the mindmap when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            buildMindmap();
+        });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>তড়িৎ হাব</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #000;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    .topbar {
+      background: #111;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    .main-button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: linear-gradient(45deg, #00BCD4, #009688);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .main-button:hover {
+      background: linear-gradient(45deg, #4DD0E1, #26A69A);
+      box-shadow: 0 0 10px rgba(0,255,255,0.3);
+    }
+    iframe {
+      flex: 1;
+      border: none;
+      width: 100%;
+      margin-top: 60px;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <button class="main-button" onclick="loadPage('home.html')">🏠 হোম</button>
+    <button class="main-button" onclick="loadPage('Mindmap.html')">🧠 মাইন্ড ম্যাপ</button>
+    <button class="main-button" onclick="loadPage('AllAnimationsMenu.html')">🎞️ অ্যানিমেশন তালিকা</button>
+  </div>
+
+  <iframe id="mainFrame" src="home.html"></iframe>
+
+  <script>
+    function loadPage(page) {
+      document.getElementById("mainFrame").src = page;
+    }
+  </script>
+</body>
+</html>

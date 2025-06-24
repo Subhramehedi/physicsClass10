@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Electric Current Simulation</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 20px;
+    }
+    .wire-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      position: relative;
+    }
+    .label {
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .wire-container {
+      width: 600px;
+      height: 60px;
+      background: #555;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .electron {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      position: absolute;
+      top: 24px;
+      background: #00bfff;
+    }
+    .left-to-right {
+      animation: moveLTR 4s linear forwards;
+    }
+    .right-to-left {
+      animation: moveRTL 4s linear forwards;
+    }
+    @keyframes moveLTR {
+      0% { left: -20px; }
+      100% { left: 620px; }
+    }
+    @keyframes moveRTL {
+      0% { left: 620px; }
+      100% { left: -20px; }
+    }
+    .terminal-labels {
+      position: absolute;
+      top: -60px;
+      width: 600px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 48px;
+      font-weight: bold;
+      color: #fff;
+      padding: 0 20px;
+      pointer-events: none;
+      text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff;
+    }
+    .arrow-container {
+      position: relative;
+      width: 600px;
+      margin-top: 10px;
+      height: 32px;
+    }
+    .arrow {
+      position: absolute;
+      top: 0;
+      font-size: 40px;
+      font-weight: bold;
+    }
+    .arrow.blue { color: #00bfff; }
+    .arrow.orange { color: orange; }
+    .arrow.blink {
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+    button {
+      background: gold;
+      color: black;
+      font-weight: bold;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 10px;
+    }
+    select {
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 16px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Electric Current Visualization</h1>
+  <p>Select which terminal is Positive (+)</p>
+  <div>
+    <select id="terminal" onchange="updatePolarity()">
+      <option value="left">+ on Left, - on Right</option>
+      <option value="right">+ on Right, - on Left</option>
+    </select>
+  </div>
+
+  <div class="wire-box">
+    <div class="label">Electron Flow (- to +)</div>
+    <div class="terminal-labels">
+      <span id="leftTerminal">+</span>
+      <span id="rightTerminal">-</span>
+    </div>
+    <div class="arrow-container" id="arrowContainerTop"></div>
+    <div class="wire-container" id="electronWire"></div>
+    <div class="arrow-container" id="arrowContainerBottom"></div>
+  </div>
+
+  <button onclick="startCurrent()">Apply Potential Difference</button>
+  <button onclick="resetCurrent()">Reset</button>
+
+  <script>
+    let interval;
+
+    function startCurrent() {
+      const electronWire = document.getElementById("electronWire");
+      const polarity = document.getElementById("terminal").value;
+
+      resetCurrent();
+      updateBlinkingArrows();
+
+      interval = setInterval(() => {
+        const electron = document.createElement("div");
+        electron.className = "electron";
+
+        if (polarity === "left") {
+          electron.classList.add("right-to-left");
+        } else {
+          electron.classList.add("left-to-right");
+        }
+
+        electronWire.appendChild(electron);
+
+        setTimeout(() => {
+          electron.remove();
+        }, 4000);
+      }, 300);
+    }
+
+    function resetCurrent() {
+      clearInterval(interval);
+      document.getElementById("electronWire").innerHTML = "";
+      document.getElementById("arrowContainerTop").innerHTML = "";
+      document.getElementById("arrowContainerBottom").innerHTML = "";
+    }
+
+    function updatePolarity() {
+      const polarity = document.getElementById("terminal").value;
+      const left = document.getElementById("leftTerminal");
+      const right = document.getElementById("rightTerminal");
+
+      if (polarity === "left") {
+        left.textContent = "+";
+        right.textContent = "-";
+      } else {
+        left.textContent = "-";
+        right.textContent = "+";
+      }
+    }
+
+    function updateBlinkingArrows() {
+      const polarity = document.getElementById("terminal").value;
+      const topArrows = document.getElementById("arrowContainerTop");
+      const bottomArrows = document.getElementById("arrowContainerBottom");
+
+      if (polarity === "left") {
+        topArrows.innerHTML = `<div class='arrow blue blink' style='left: 520px;'>&larr;</div>
+                               <div class='arrow blue blink' style='left: 480px;'>&larr;</div>
+                               <div class='arrow blue blink' style='left: 440px;'>&larr;</div>`;
+        bottomArrows.innerHTML = `<div class='arrow orange blink' style='left: 10px;'>&rarr;</div>
+                                  <div class='arrow orange blink' style='left: 50px;'>&rarr;</div>
+                                  <div class='arrow orange blink' style='left: 90px;'>&rarr;</div>`;
+      } else {
+        topArrows.innerHTML = `<div class='arrow blue blink' style='left: 10px;'>&rarr;</div>
+                               <div class='arrow blue blink' style='left: 50px;'>&rarr;</div>
+                               <div class='arrow blue blink' style='left: 90px;'>&rarr;</div>`;
+        bottomArrows.innerHTML = `<div class='arrow orange blink' style='left: 520px;'>&larr;</div>
+                                  <div class='arrow orange blink' style='left: 480px;'>&larr;</div>
+                                  <div class='arrow orange blink' style='left: 440px;'>&larr;</div>`;
+      }
+    }
+
+    updatePolarity();
+  </script>
+</body>
+</html>

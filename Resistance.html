@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Resistance Analogy</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    canvas {
+      background-color: #222;
+      border: 2px solid #555;
+      margin-top: 20px;
+    }
+    input[type=range] {
+      width: 300px;
+    }
+    label {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    #resistanceValue {
+      font-weight: bold;
+      color: gold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Resistance Analogy</h1>
+
+  <label for="resistanceSlider">Resistance (R): <span id="resistanceValue">5</span></label><br>
+  <input type="range" id="resistanceSlider" min="1" max="10" value="5">
+
+  <div style="margin-top:10px; font-size:16px; color:lightgreen;">
+    Potential Difference (V) = constant
+  </div>
+
+  <canvas id="canvas" width="700" height="200"></canvas>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const resistanceSlider = document.getElementById('resistanceSlider');
+    const resistanceValue = document.getElementById('resistanceValue');
+
+    let resistance = parseInt(resistanceSlider.value);
+    let droplets = [];
+    let dropletInterval;
+
+    function resetDroplets() {
+      droplets = [];
+      clearInterval(dropletInterval);
+      const interval = 400;
+      dropletInterval = setInterval(() => {
+        // যদি আগের ড্রপলেটটা এখনো বাঁ দিকেই থাকে, তাহলে নতুনটা ঢোকাবে না
+        if (
+          droplets.length === 0 ||
+          droplets[droplets.length - 1].x > 120
+        ) {
+          droplets.push({ x: 50, y: 100 });
+        }
+        if (droplets.length > 30) droplets.shift();
+      }, interval);
+    }
+
+    resistanceSlider.addEventListener('input', () => {
+      resistance = parseInt(resistanceSlider.value);
+      resistanceValue.textContent = resistance;
+      resetDroplets();
+    });
+
+    function drawPipe() {
+      ctx.fillStyle = '#444';
+      ctx.fillRect(50, 80, 600, 40);
+
+      // Resistance segment
+      ctx.fillStyle = 'crimson';
+      ctx.fillRect(320, 80, 60, 40);
+
+      ctx.fillStyle = 'white';
+      ctx.font = '14px sans-serif';
+      ctx.fillText('Resistance Area', 330, 75);
+    }
+
+    function drawDroplets() {
+      ctx.fillStyle = '#00ccff';
+      for (let drop of droplets) {
+        ctx.beginPath();
+        ctx.arc(drop.x, drop.y, 6, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+    }
+
+    function updateDroplets() {
+      const baseSpeed = 2 / resistance * 5;
+      const resistanceStart = 320;
+      const resistanceEnd = 380;
+
+      for (let drop of droplets) {
+        if (drop.x >= resistanceStart && drop.x <= resistanceEnd) {
+          drop.x += baseSpeed * 0.3; // slow down in resistance
+        } else {
+          drop.x += baseSpeed;
+        }
+
+        if (drop.x > 650) drop.x = 50;
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawPipe();
+      updateDroplets();
+      drawDroplets();
+      requestAnimationFrame(animate);
+    }
+
+    resetDroplets();
+    animate();
+  </script>
+</body>
+</html>

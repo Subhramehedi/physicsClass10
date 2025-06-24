@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>সার্কিট</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+            overflow-x: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            text-align: center;
+            color: #00d4ff;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(0,212,255,0.5);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            color: #00d4ff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid #00d4ff;
+            background: rgba(255,255,255,0.3);
+        }
+
+        button {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,212,255,0.4);
+        }
+
+        .circuit-area {
+            background: #111;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .battery {
+            position: absolute;
+            left: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 80px;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 12px;
+            box-shadow: 0 0 20px rgba(255,107,107,0.5);
+        }
+
+        .resistor {
+            position: absolute;
+            width: 60px;
+            height: 20px;
+            background: linear-gradient(90deg, #8b4513, #cd853f, #8b4513);
+            border: 2px solid #654321;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .resistor:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(205,133,63,0.6);
+        }
+
+        .wire {
+            position: absolute;
+            background: #00ff00;
+            box-shadow: 0 0 10px rgba(0,255,0,0.5);
+        }
+
+        .horizontal-wire {
+            height: 3px;
+        }
+
+        .vertical-wire {
+            width: 3px;
+        }
+
+        .current-flow {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #ffff00 0%, #ffaa00 70%, transparent 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255,255,0,0.8), 0 0 25px rgba(255,170,0,0.4);
+            animation: currentPulse 1.5s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        @keyframes currentPulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 1; 
+            }
+            50% { 
+                transform: scale(1.3);
+                opacity: 0.7; 
+            }
+        }
+
+        .info-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #2d3748, #4a5568);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #00d4ff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .info-card h3 {
+            color: #00d4ff;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .value {
+            font-size: 1.1em;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+            border-left: 4px solid #00d4ff;
+        }
+
+        .series-config {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+        }
+
+        .parallel-config {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+
+        .formula {
+            background: rgba(0,212,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #00d4ff;
+            font-family: 'Courier New', monospace;
+        }
+
+        .animation-controls {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .info-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>সার্কিট</h1>
+        <p style="text-align: center; color: #ccc; margin-bottom: 30px;">রোধের সমবায় - Series ও Parallel Combination</p>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>ভোল্টেজ (V):</label>
+                <input type="number" id="voltage" value="12" min="1" max="50">
+            </div>
+            
+            <div class="control-group">
+                <label>রেজিস্টর 1 (Ω):</label>
+                <input type="number" id="r1" value="10" min="1" max="1000">
+            </div>
+            
+            <div class="control-group">
+                <label>রেজিস্টর 2 (Ω):</label>
+                <input type="number" id="r2" value="20" min="1" max="1000">
+            </div>
+            
+            <div class="control-group">
+                <label>রেজিস্টর 3 (Ω):</label>
+                <input type="number" id="r3" value="30" min="1" max="1000">
+            </div>
+            
+            <div class="control-group">
+                <label>সংযোগ প্রকার:</label>
+                <select id="connection">
+                    <option value="series">Series (শ্রেণি)</option>
+                    <option value="parallel">Parallel (সমান্তরাল)</option>
+                    <option value="mixed">Mixed (মিশ্র)</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <button onclick="updateCircuit()">সার্কিট আপডেট করুন</button>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #00ff00; box-shadow: 0 0 5px rgba(0,255,0,0.5);"></div>
+                <span>তার (Wire)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(90deg, #8b4513, #cd853f);"></div>
+                <span>রেজিস্টর (Resistor)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ffff00; border-radius: 50%; box-shadow: 0 0 5px rgba(255,255,0,0.5);"></div>
+                <span>কারেন্ট ফ্লো (Current Flow)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(90deg, #ff6b6b, #ff8e8e);"></div>
+                <span>ব্যাটারি (Battery)</span>
+            </div>
+        </div>
+
+        <div class="circuit-area" id="circuitArea">
+            <div class="battery" id="battery">
+                <div>+<br>12V<br>-</div>
+            </div>
+        </div>
+
+        <div class="animation-controls">
+            <button onclick="toggleAnimation()">অ্যানিমেশন চালু/বন্ধ</button>
+            <button onclick="resetCircuit()">রিসেট</button>
+        </div>
+
+        <div class="info-panel">
+            <div class="info-card">
+                <h3>সার্কিট তথ্য</h3>
+                <div class="value">সমতুল্য রোধ: <span id="totalResistance">0</span> Ω</div>
+                <div class="value">মোট কারেন্ট: <span id="totalCurrent">0</span> A</div>
+                <div class="value">মোট পাওয়ার: <span id="totalPower">0</span> W</div>
+            </div>
+            
+            <div class="info-card">
+                <h3>রেজিস্টর বিশ্লেষণ</h3>
+                <div class="value">R1 এর কারেন্ট: <span id="i1">0</span> A</div>
+                <div class="value">R2 এর কারেন্ট: <span id="i2">0</span> A</div>
+                <div class="value">R3 এর কারেন্ট: <span id="i3">0</span> A</div>
+            </div>
+            
+            <div class="info-card">
+                <h3>ভোল্টেজ বিশ্লেষণ</h3>
+                <div class="value">R1 এর ভোল্টেজ: <span id="v1">0</span> V</div>
+                <div class="value">R2 এর ভোল্টেজ: <span id="v2">0</span> V</div>
+                <div class="value">R3 এর ভোল্টেজ: <span id="v3">0</span> V</div>
+            </div>
+            
+            <div class="info-card">
+                <h3>সূত্র ও নিয়ম</h3>
+                <div class="formula" id="formula">
+                    <strong>Series:</strong><br>
+                    R_total = R1 + R2 + R3<br>
+                    I_total = V/R_total<br>
+                    V1 = I × R1, V2 = I × R2, V3 = I × R3
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let animationRunning = false;
+        let currentFlowElements = [];
+
+        function updateCircuit() {
+            const voltage = parseFloat(document.getElementById('voltage').value);
+            const r1 = parseFloat(document.getElementById('r1').value);
+            const r2 = parseFloat(document.getElementById('r2').value);
+            const r3 = parseFloat(document.getElementById('r3').value);
+            const connection = document.getElementById('connection').value;
+            
+            // Update battery display
+            document.getElementById('battery').innerHTML = `<div>+<br>${voltage}V<br>-</div>`;
+            
+            // Clear previous circuit
+            clearCircuit();
+            
+            let totalResistance, totalCurrent, i1, i2, i3, v1, v2, v3;
+            
+            if (connection === 'series') {
+                drawSeriesCircuit(r1, r2, r3);
+                totalResistance = r1 + r2 + r3;
+                totalCurrent = voltage / totalResistance;
+                i1 = i2 = i3 = totalCurrent;
+                v1 = i1 * r1;
+                v2 = i2 * r2;
+                v3 = i3 * r3;
+                
+                document.getElementById('formula').innerHTML = `
+                    <strong>Series Connection (শ্রেণি সমবায়):</strong><br>
+                    R_total = R1 + R2 + R3 = ${r1} + ${r2} + ${r3} = ${totalResistance.toFixed(2)} Ω<br>
+                    I_total = V/R_total = ${voltage}/${totalResistance.toFixed(2)} = ${totalCurrent.toFixed(3)} A<br>
+                    সব রেজিস্টরে একই কারেন্ট প্রবাহিত হয়
+                `;
+                
+            } else if (connection === 'parallel') {
+                drawParallelCircuit(r1, r2, r3);
+                totalResistance = 1 / (1/r1 + 1/r2 + 1/r3);
+                totalCurrent = voltage / totalResistance;
+                v1 = v2 = v3 = voltage;
+                i1 = v1 / r1;
+                i2 = v2 / r2;
+                i3 = v3 / r3;
+                
+                document.getElementById('formula').innerHTML = `
+                    <strong>Parallel Connection (সমান্তরাল সমবায়):</strong><br>
+                    1/R_total = 1/R1 + 1/R2 + 1/R3 = 1/${r1} + 1/${r2} + 1/${r3}<br>
+                    R_total = ${totalResistance.toFixed(2)} Ω<br>
+                    I_total = ${totalCurrent.toFixed(3)} A<br>
+                    সব রেজিস্টরে একই ভোল্টেজ প্রয়োগ হয়
+                `;
+                
+            } else { // mixed
+                drawMixedCircuit(r1, r2, r3);
+                // R2 and R3 in parallel, then in series with R1
+                const r23_parallel = 1 / (1/r2 + 1/r3);
+                totalResistance = r1 + r23_parallel;
+                totalCurrent = voltage / totalResistance;
+                i1 = totalCurrent;
+                v1 = i1 * r1;
+                const v23 = voltage - v1;
+                v2 = v3 = v23;
+                i2 = v2 / r2;
+                i3 = v3 / r3;
+                
+                document.getElementById('formula').innerHTML = `
+                    <strong>Mixed Connection (মিশ্র সমবায়):</strong><br>
+                    R2 ও R3 parallel: 1/R23 = 1/${r2} + 1/${r3}, R23 = ${r23_parallel.toFixed(2)} Ω<br>
+                    R_total = R1 + R23 = ${r1} + ${r23_parallel.toFixed(2)} = ${totalResistance.toFixed(2)} Ω<br>
+                    I_total = ${totalCurrent.toFixed(3)} A
+                `;
+            }
+            
+            // Update display values
+            document.getElementById('totalResistance').textContent = totalResistance.toFixed(2);
+            document.getElementById('totalCurrent').textContent = totalCurrent.toFixed(3);
+            document.getElementById('totalPower').textContent = (voltage * totalCurrent).toFixed(3);
+            
+            document.getElementById('i1').textContent = i1.toFixed(3);
+            document.getElementById('i2').textContent = i2.toFixed(3);
+            document.getElementById('i3').textContent = i3.toFixed(3);
+            
+            document.getElementById('v1').textContent = v1.toFixed(2);
+            document.getElementById('v2').textContent = v2.toFixed(2);
+            document.getElementById('v3').textContent = v3.toFixed(2);
+            
+            // Start animation
+            if (animationRunning) {
+                startCurrentAnimation(connection);
+            }
+        }
+
+        function clearCircuit() {
+            const circuitArea = document.getElementById('circuitArea');
+            const elementsToRemove = circuitArea.querySelectorAll('.resistor, .wire, .current-flow');
+            elementsToRemove.forEach(el => el.remove());
+            currentFlowElements = [];
+        }
+
+        function drawSeriesCircuit(r1, r2, r3) {
+            const circuitArea = document.getElementById('circuitArea');
+            
+            // Top horizontal wire from battery to first resistor
+            createWire(100, 150, 150, 3, 'horizontal');
+            // Wire between R1 and R2
+            createWire(310, 150, 150, 3, 'horizontal');
+            // Wire between R2 and R3
+            createWire(520, 150, 150, 3, 'horizontal');
+            // Wire from R3 to right side
+            createWire(730, 150, 150, 3, 'horizontal');
+            // Right vertical wire
+            createWire(880, 150, 3, 150, 'vertical');
+            // Bottom horizontal wire
+            createWire(100, 300, 780, 3, 'horizontal');
+            // Left vertical wire connecting battery
+            createWire(100, 150, 3, 155, 'vertical');
+            
+            // Draw resistors
+            createResistor(250, 140, `R1\n${r1}Ω`);
+            createResistor(460, 140, `R2\n${r2}Ω`);
+            createResistor(670, 140, `R3\n${r3}Ω`);
+        }
+
+        function drawParallelCircuit(r1, r2, r3) {
+            const circuitArea = document.getElementById('circuitArea');
+            
+            // Left vertical connection from battery
+            createWire(100, 150, 3, 150, 'vertical');
+            
+            // Main horizontal wires (left side)
+            createWire(100, 150, 150, 3, 'horizontal');
+            createWire(100, 300, 700, 3, 'horizontal');
+            
+            // Vertical junction wires (left)
+            createWire(250, 100, 3, 100, 'vertical');
+            
+            // Branch wires to resistors
+            createWire(250, 100, 200, 3, 'horizontal'); // to R1
+            createWire(250, 150, 200, 3, 'horizontal'); // to R2  
+            createWire(250, 200, 200, 3, 'horizontal'); // to R3
+            
+            // Branch wires from resistors
+            createWire(510, 100, 200, 3, 'horizontal'); // from R1
+            createWire(510, 150, 200, 3, 'horizontal'); // from R2
+            createWire(510, 200, 200, 3, 'horizontal'); // from R3
+            
+            // Vertical junction wires (right)
+            createWire(710, 100, 3, 105, 'vertical');
+            
+            // Main horizontal wires (right side)
+            createWire(710, 150, 150, 3, 'horizontal');
+            createWire(710, 300, 150, 3, 'horizontal');
+            
+            // Right vertical connection
+            createWire(860, 150, 3, 154, 'vertical');
+            
+            // Resistors
+            createResistor(450, 90, `R1\n${r1}Ω`);
+            createResistor(450, 140, `R2\n${r2}Ω`);
+            createResistor(450, 190, `R3\n${r3}Ω`);
+        }
+
+        function drawMixedCircuit(r1, r2, r3) {
+            const circuitArea = document.getElementById('circuitArea');
+            
+            // Left vertical connection from battery
+            createWire(100, 150, 3, 150, 'vertical');
+            
+            // Wire from battery to R1
+            createWire(100, 150, 120, 3, 'horizontal');
+            
+            // Wire from R1 to junction
+            createWire(280, 150, 120, 3, 'horizontal');
+            
+            // Vertical junction for parallel section
+            createWire(400, 120, 3, 63, 'vertical');
+            
+            // Branch wires to R2 and R3
+            createWire(400, 120, 150, 3, 'horizontal'); // to R2
+            createWire(400, 180, 150, 3, 'horizontal'); // to R3
+            
+            // Branch wires from R2 and R3
+            createWire(610, 120, 150, 3, 'horizontal'); // from R2
+            createWire(610, 180, 150, 3, 'horizontal'); // from R3
+            
+            // Vertical junction after parallel section
+            createWire(760, 120, 3, 63, 'vertical');
+            
+            // Wire from junction to right side
+            createWire(760, 150, 100, 3, 'horizontal');
+            
+            // Right vertical connection
+            createWire(860, 150, 3, 153, 'vertical');
+            
+            // Bottom wire
+            createWire(100, 300, 760, 3, 'horizontal');
+            
+            // Resistors
+            createResistor(220, 140, `R1\n${r1}Ω`);
+            createResistor(550, 110, `R2\n${r2}Ω`);
+            createResistor(550, 170, `R3\n${r3}Ω`);
+        }
+
+        function createWire(x, y, width, height, type) {
+            const wire = document.createElement('div');
+            wire.className = `wire ${type}-wire`;
+            wire.style.left = x + 'px';
+            wire.style.top = y + 'px';
+            wire.style.width = width + 'px';
+            wire.style.height = height + 'px';
+            document.getElementById('circuitArea').appendChild(wire);
+        }
+
+        function createResistor(x, y, label) {
+            const resistor = document.createElement('div');
+            resistor.className = 'resistor';
+            resistor.style.left = x + 'px';
+            resistor.style.top = y + 'px';
+            resistor.innerHTML = label.replace('\n', '<br>');
+            document.getElementById('circuitArea').appendChild(resistor);
+        }
+
+        function toggleAnimation() {
+            animationRunning = !animationRunning;
+            if (animationRunning) {
+                const connection = document.getElementById('connection').value;
+                startCurrentAnimation(connection);
+            } else {
+                stopCurrentAnimation();
+            }
+        }
+
+        function startCurrentAnimation(connection) {
+            stopCurrentAnimation();
+            
+            const paths = getAnimationPaths(connection);
+            paths.forEach((path, index) => {
+                setTimeout(() => {
+                    animateCurrentFlow(path, 2000);
+                }, index * 200);
+            });
+        }
+
+        function getAnimationPaths(connection) {
+            if (connection === 'series') {
+                return [
+                    // Main current path
+                    [ {x: 250, y: 147}, {x: 310, y: 147}, {x: 460, y: 147}, {x: 520, y: 147}, {x: 670, y: 147}, {x: 730, y: 147}, {x: 880, y: 147}, {x: 880, y: 297},{x: 440, y: 297}, {x: 100, y: 297}, {x: 100, y: 147}]
+                ];
+            } else if (connection === 'parallel') {
+                return [
+                    // Main branch current
+                    [{x: 90, y: 147}, {x: 250, y: 147}, {x: 250, y: 97}, {x: 450, y: 97}, {x: 510, y: 97}, {x: 710, y: 97}, {x: 710, y: 147}, {x: 860, y: 147}, {x: 860, y: 297}, {x: 100, y: 297}, {x: 100, y: 297}, {x: 100, y: 147}],
+                    // Branch 2 current (R2)
+                    [{x: 250, y: 147}, {x: 450, y: 147}, {x: 510, y: 147}, {x: 710, y: 147}],
+                    // Branch 3 current (R3)  
+                    [{x: 250, y: 197}, {x: 450, y: 197}, {x: 510, y: 197}, {x: 710, y: 197}]
+                ];
+            } else {
+                return [
+                    // Main current through R1
+                    [{x: 90, y: 147}, {x: 220, y: 147}, {x: 280, y: 147}, {x: 400, y: 147}, {x: 400, y: 117}, {x: 550, y: 117}, {x: 610, y: 117}, {x: 760, y: 117}, {x: 760, y: 147}, {x: 860, y: 147}, {x: 860, y: 297}, {x: 100, y: 297}, {x: 50, y: 297}, {x: 50, y: 130}],
+                    // Branch current through R3
+                    [{x: 400, y: 147}, {x: 400, y: 177}, {x: 550, y: 177}, {x: 610, y: 177}, {x: 760, y: 177}, {x: 760, y: 147}]
+                ];
+            }
+        }
+
+        function animateCurrentFlow(path, duration) {
+            const currentDot = document.createElement('div');
+            currentDot.className = 'current-flow';
+            document.getElementById('circuitArea').appendChild(currentDot);
+            currentFlowElements.push(currentDot);
+            
+            let pathIndex = 0;
+            const stepTime = duration / (path.length - 1);
+            
+            function moveToNext() {
+                if (pathIndex < path.length && animationRunning) {
+                    const point = path[pathIndex];
+                    currentDot.style.left = (point.x - 5) + 'px';
+                    currentDot.style.top = (point.y - 5) + 'px';
+                    pathIndex++;
+                    
+                    if (pathIndex < path.length) {
+                        setTimeout(moveToNext, stepTime);
+                    } else {
+                        // Restart animation smoothly
+                        pathIndex = 0;
+                        setTimeout(moveToNext, 200);
+                    }
+                } else if (!animationRunning) {
+                    currentDot.remove();
+                }
+            }
+            
+            moveToNext();
+        }
+
+        function stopCurrentAnimation() {
+            currentFlowElements.forEach(el => el.remove());
+            currentFlowElements = [];
+        }
+
+        function resetCircuit() {
+            document.getElementById('voltage').value = 12;
+            document.getElementById('r1').value = 10;
+            document.getElementById('r2').value = 20;
+            document.getElementById('r3').value = 30;
+            document.getElementById('connection').value = 'series';
+            animationRunning = false;
+            updateCircuit();
+        }
+
+        // Initialize circuit
+        updateCircuit();
+    </script>
+</body>
+</html>
