@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wheel Rolling Simulation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .simulation-area {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #canvas {
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 100%);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .start-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        .reset-btn {
+            background: linear-gradient(45deg, #f44336, #da190b);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+        
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+        }
+        
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+        }
+        
+        .speed-control label {
+            font-weight: 600;
+        }
+        
+        .speed-control input {
+            width: 100px;
+        }
+        
+        select {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        select option {
+            background: #2C3E50;
+            color: white;
+        }
+        
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #FFD700;
+        }
+        
+        .info-card h3 {
+            margin: 0 0 10px 0;
+            color: #FFD700;
+        }
+        
+        .info-card p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .highlight {
+            color: #FFD700;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎡 Wheel Rolling Simulation - Point P Displacement</h1>
+        
+        <div class="simulation-area">
+            <canvas id="canvas" width="1000" height="400"></canvas>
+        </div>
+        
+        <div class="controls">
+            <button class="start-btn" onclick="startAnimation()">Start Animation</button>
+            <button class="reset-btn" onclick="resetAnimation()">Reset</button>
+            <div class="speed-control">
+                <label for="speed">Speed:</label>
+                <input type="range" id="speed" min="0.5" max="5" value="2" step="0.5" oninput="updateSpeed(this.value)">
+                <span id="speedValue">2x</span>
+            </div>
+            <div class="speed-control">
+                <label for="revolutions">Revolutions:</label>
+                <input type="range" id="revolutions" min="0.25" max="3" value="0.5" step="0.25" oninput="updateRevolutions(this.value)">
+                <span id="revolutionsValue">0.5</span>
+            </div>
+            <div class="speed-control">
+                <label for="startPosition">Start Position:</label>
+                <select id="startPosition" onchange="updateStartPosition(this.value)">
+                    <option value="bottom">Top </option>
+                    <option value="right">Left Side</option>
+                    <option value="top">Bottom (Ground Contact)</option>
+                    <option value="left">Right Side</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <h2>📊 Real-time Calculations</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Wheel Properties</h3>
+                    <p>Radius: <span class="highlight">5 m</span></p>
+                    <p>Circumference: <span class="highlight">31.42 m</span></p>
+                    <p>Revolution: <span id="revolution" class="highlight">0°</span></p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Point P Position</h3>
+                    <p>X-coordinate: <span id="pointX" class="highlight">0 m</span></p>
+                    <p>Y-coordinate: <span id="pointY" class="highlight">5 m</span></p>
+                    <p>Distance from start: <span id="distance" class="highlight">0 m</span></p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Theoretical Values</h3>
+                    <p>Horizontal displacement: <span class="highlight">15.71 m</span></p>
+                    <p>Vertical displacement: <span class="highlight">10.00 m</span></p>
+                    <p>Total displacement: <span class="highlight">18.63 m</span></p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Animation Status</h3>
+                    <p>Status: <span id="status" class="highlight">Ready</span></p>
+                    <p>Progress: <span id="progress" class="highlight">0%</span></p>
+                    <p>Path: <span class="highlight">Cycloid Curve</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Simulation parameters
+        const radius = 50; // 5m scaled to 50 pixels
+        const groundY = 350;
+        const startX = 1;
+        let wheelCenterX = startX + radius;
+        let wheelCenterY = groundY - radius;
+        let angle = 0;
+        let animationId;
+        let isAnimating = false;
+        let speed = 2;
+        let targetRevolutions = 0.5;
+        let maxAngle = Math.PI; // Half revolution by default
+        let initialAngleOffset = -Math.PI/2; // Bottom position by default
+        
+        // Path tracking
+        let pathPoints = [];
+        let initialPointX, initialPointY;
+        
+        function drawWheel() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw ground
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(0, groundY);
+            ctx.lineTo(canvas.width, groundY);
+            ctx.stroke();
+            
+            // Draw wheel
+            ctx.strokeStyle = '#2C3E50';
+            ctx.fillStyle = 'rgba(52, 152, 219, 0.3)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(wheelCenterX, wheelCenterY, radius, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+            
+            // Draw spokes
+            ctx.strokeStyle = '#34495E';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 8; i++) {
+                const spokeAngle = (i * Math.PI) / 4 + angle;
+                const spokeX = wheelCenterX + (radius - 10) * Math.cos(spokeAngle);
+                const spokeY = wheelCenterY + (radius - 10) * Math.sin(spokeAngle);
+                ctx.beginPath();
+                ctx.moveTo(wheelCenterX, wheelCenterY);
+                ctx.lineTo(spokeX, spokeY);
+                ctx.stroke();
+            }
+            
+            // Calculate point P position
+            const pointX = wheelCenterX + radius * Math.cos(angle + initialAngleOffset);
+            const pointY = wheelCenterY + radius * Math.sin(angle + initialAngleOffset);
+            
+            // Set initial position on first draw
+            if (angle === 0 && initialPointX === undefined) {
+                initialPointX = pointX;
+                initialPointY = pointY;
+            }
+            
+            // Add to path
+            pathPoints.push({x: pointX, y: pointY});
+            if (pathPoints.length > 500) pathPoints.shift();
+            
+            // Draw cycloid path
+            if (pathPoints.length > 1) {
+                ctx.strokeStyle = '#E74C3C';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(pathPoints[0].x, pathPoints[0].y);
+                for (let i = 1; i < pathPoints.length; i++) {
+                    ctx.lineTo(pathPoints[i].x, pathPoints[i].y);
+                }
+                ctx.stroke();
+            }
+            
+            // Draw point P
+            ctx.fillStyle = '#E74C3C';
+            ctx.beginPath();
+            ctx.arc(pointX, pointY, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Draw point P label
+            ctx.fillStyle = '#2C3E50';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('P', pointX + 12, pointY - 8);
+            
+            // Draw displacement vector (after some progress)
+            if (angle > 0.1) {
+                ctx.strokeStyle = '#27AE60';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(initialPointX, initialPointY);
+                ctx.lineTo(pointX, pointY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Draw displacement arrow
+                const dx = pointX - initialPointX;
+                const dy = pointY - initialPointY;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                if (length > 20) {
+                    const arrowAngle = Math.atan2(dy, dx);
+                    const arrowSize = 10;
+                    
+                    ctx.fillStyle = '#27AE60';
+                    ctx.beginPath();
+                    ctx.moveTo(pointX, pointY);
+                    ctx.lineTo(pointX - arrowSize * Math.cos(arrowAngle - 0.3), 
+                              pointY - arrowSize * Math.sin(arrowAngle - 0.3));
+                    ctx.lineTo(pointX - arrowSize * Math.cos(arrowAngle + 0.3), 
+                              pointY - arrowSize * Math.sin(arrowAngle + 0.3));
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+            
+            // Update info panel
+            updateInfoPanel(pointX, pointY);
+        }
+        
+        function updateInfoPanel(pointX, pointY) {
+            const revolution = (angle * 180 / Math.PI);
+            const realX = (pointX - initialPointX) / 10; // Convert to meters
+            const realY = (initialPointY - pointY) / 10; // Convert to meters (inverted Y)
+            const distance = Math.sqrt(realX * realX + realY * realY);
+            const progress = Math.min((angle / maxAngle) * 100, 100);
+            
+            document.getElementById('revolution').textContent = revolution.toFixed(1) + '° (' + (revolution/360).toFixed(2) + ' rev)';
+            document.getElementById('pointX').textContent = realX.toFixed(2) + ' m';
+            document.getElementById('pointY').textContent = realY.toFixed(2) + ' m';
+            document.getElementById('distance').textContent = distance.toFixed(2) + ' m';
+            document.getElementById('progress').textContent = progress.toFixed(1) + '%';
+            document.getElementById('status').textContent = isAnimating ? 'Animating' : (progress >= 100 ? 'Completed' : 'Ready');
+        }
+        
+        function animate() {
+            if (angle < maxAngle) { // Stop at specified revolutions
+                angle += 0.02 * speed;
+                wheelCenterX = startX + radius + (angle * radius);
+                drawWheel();
+                animationId = requestAnimationFrame(animate);
+            } else {
+                isAnimating = false;
+                document.getElementById('status').textContent = 'Completed';
+            }
+        }
+        
+        function startAnimation() {
+            if (!isAnimating && angle < maxAngle) {
+                isAnimating = true;
+                animate();
+            }
+        }
+        
+        function updateStartPosition(position) {
+            // Stop animation if running
+            if (isAnimating) {
+                cancelAnimationFrame(animationId);
+                isAnimating = false;
+            }
+            
+            // Set angle offset based on position
+            switch(position) {
+                case 'bottom':
+                    initialAngleOffset = -Math.PI/2;
+                    break;
+                case 'right':
+                    initialAngleOffset = 0;
+                    break;
+                case 'top':
+                    initialAngleOffset = Math.PI/2;
+                    break;
+                case 'left':
+                    initialAngleOffset = Math.PI;
+                    break;
+            }
+            
+            // Reset animation
+            resetAnimation();
+        }
+        
+        function resetAnimation() {
+            cancelAnimationFrame(animationId);
+            isAnimating = false;
+            angle = 0;
+            wheelCenterX = startX + radius;
+            wheelCenterY = groundY - radius;
+            pathPoints = [];
+            initialPointX = undefined;
+            initialPointY = undefined;
+            drawWheel();
+        }
+        
+        function updateSpeed(value) {
+            speed = parseFloat(value);
+            document.getElementById('speedValue').textContent = value + 'x';
+        }
+        
+        function updateRevolutions(value) {
+            targetRevolutions = parseFloat(value);
+            maxAngle = targetRevolutions * 2 * Math.PI;
+            document.getElementById('revolutionsValue').textContent = value;
+            
+            // Update theoretical values in info panel
+            updateTheoreticalValues();
+        }
+        
+        function updateTheoreticalValues() {
+            const horizontalDisp = (targetRevolutions * 2 * Math.PI * 5).toFixed(2); // 2πr * revolutions
+            const verticalDisp = targetRevolutions === 0.5 ? '10.00' : 
+                                targetRevolutions === 1 ? '0.00' : 
+                                targetRevolutions === 1.5 ? '10.00' : 
+                                targetRevolutions === 2 ? '0.00' : 
+                                (targetRevolutions % 1 === 0.5 ? '10.00' : '0.00');
+            const totalDisp = Math.sqrt(Math.pow(parseFloat(horizontalDisp), 2) + Math.pow(parseFloat(verticalDisp), 2)).toFixed(2);
+            
+            document.querySelector('.info-card:nth-child(3) p:nth-child(2)').innerHTML = `Horizontal displacement: <span class="highlight">${horizontalDisp} m</span>`;
+            document.querySelector('.info-card:nth-child(3) p:nth-child(3)').innerHTML = `Vertical displacement: <span class="highlight">${verticalDisp} m</span>`;
+            document.querySelector('.info-card:nth-child(3) p:nth-child(4)').innerHTML = `Total displacement: <span class="highlight">${totalDisp} m</span>`;
+        }
+        
+        // Initial draw
+        drawWheel();
+    </script>
+</body>
+</html>
