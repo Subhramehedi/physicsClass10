@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>জুলের সূত্র - ইন্টারেক্টিভ প্রশ্ন উত্তর</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .question-card {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border: none;
+            color: white;
+            font-size: 16px;
+            text-align: left;
+        }
+        
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #2980b9, #3498db);
+        }
+        
+        .question-card.active {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            transform: translateY(-3px);
+        }
+        
+        .question-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ecf0f1;
+        }
+        
+        .question-text {
+            font-size: 1.1em;
+            line-height: 1.4;
+        }
+        
+        .answer-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border-left: 5px solid #3498db;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .answer-section.show {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .answer-title {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .answer-content {
+            color: #34495e;
+            font-size: 1.1em;
+            line-height: 1.8;
+        }
+        
+        .answer-content h4 {
+            color: #e74c3c;
+            margin: 20px 0 10px 0;
+            font-size: 1.2em;
+        }
+        
+        .answer-content ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        
+        .answer-content li {
+            margin: 10px 0;
+        }
+        
+        .formula {
+            background: #ecf0f1;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+            display: inline-block;
+            border-left: 4px solid #3498db;
+        }
+        
+        .clear-btn {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .clear-btn:hover {
+            background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .question-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>জুলের সূত্র</h1>
+            <p>তড়িৎপ্রবাহের তাপীয় ফল সম্পর্কে ইন্টারেক্টিভ প্রশ্ন-উত্তর</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="question-grid" id="questionGrid">
+            <!-- Questions will be populated by JavaScript -->
+        </div>
+        
+        <div class="answer-section" id="answerSection">
+            <div class="answer-title" id="answerTitle"></div>
+            <div class="answer-content" id="answerContent"></div>
+        </div>
+        
+        <button class="clear-btn" onclick="clearAnswer()">সব প্রশ্ন দেখুন</button>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                id: 1,
+                question: "তড়িৎপ্রবাহের তাপীয় ফল বলতে কী বোঝায় এবং পরিবাহীর মধ্যে এর কারণ কী?",
+                answer: `
+                    <p>যখন কোনো পরিবাহীর মধ্যে দিয়ে তড়িৎপ্রবাহ চালনা করা হয়, তখন পরিবাহীর মধ্যে কিছু পরিমাণ তাপ উৎপন্ন হয়। এই ঘটনাকে <strong>তড়িৎপ্রবাহের তাপীয় ফল (Heating effect of electric current)</strong> বলা হয়।</p>
+                    
+                    <h4>কারণ:</h4>
+                    <p>পরিবাহীর মধ্যে দিয়ে তড়িৎপ্রবাহ চালনার সময় তার মধ্যে থাকা মুক্ত ইলেকট্রনগুলি নিয়মিত গতিতে চলে। এই ইলেকট্রনগুলি পরিবাহীর অণু-পরমাণুগুলির সঙ্গে অনবরত সংঘর্ষ ঘটায়। এর ফলে ইলেকট্রনগুলির গতিশক্তি অণু-পরমাণুগুলিতে স্থানান্তরিত হয়, যার কারণে অণু-পরমাণুগুলির স্পন্দন গতি বৃদ্ধি পায় এবং তাদের উষ্ণতা বৃদ্ধি পায়। এভাবেই তড়িৎপ্রবাহের ফলে পরিবাহীতে তাপ উৎপন্ন হয়।</p>
+                `
+            },
+            {
+                id: 2,
+                question: "পরিবাহীতে উৎপন্ন তাপ সম্পর্কিত জুলের তিনটি প্রধান সূত্র বর্ণনা করুন।",
+                answer: `
+                    <p>পরিবাহীতে উৎপন্ন তাপ (H) সংক্রান্ত জুলের তিনটি প্রধান সূত্র নিম্নরূপ:</p>
+                    
+                    <h4>১. প্রথম সূত্র (প্রবাহের সূত্র):</h4>
+                    <p>পরিবাহীর রোধ (R) এবং তড়িৎপ্রবাহের সময় (t) স্থির থাকলে, পরিবাহীতে উৎপন্ন তাপ (H) তড়িৎপ্রবাহের (I) বর্গের (I²) সমানুপাতিক।</p>
+                    <div class="formula">H ∝ I²</div>
+                    
+                    <h4>২. দ্বিতীয় সূত্র (রোধের সূত্র):</h4>
+                    <p>পরিবাহীতে তড়িৎপ্রবাহ (I) এবং তড়িৎপ্রবাহের সময় (t) স্থির থাকলে, পরিবাহীতে উৎপন্ন তাপ (H) পরিবাহীর রোধের (R) সমানুপাতিক।</p>
+                    <div class="formula">H ∝ R</div>
+                    
+                    <h4>৩. তৃতীয় সূত্র (সময়ের সূত্র):</h4>
+                    <p>পরিবাহীর রোধ (R) এবং তড়িৎপ্রবাহ (I) স্থির থাকলে, পরিবাহীতে উৎপন্ন তাপ (H) তড়িৎপ্রবাহের সময়ের (t) সমানুপাতিক।</p>
+                    <div class="formula">H ∝ t</div>
+                `
+            },
+            {
+                id: 3,
+                question: "একটি পরিবাহীতে I পরিমাণ তড়িৎপ্রবাহ t সময়ে R রোধের মধ্য দিয়ে প্রবাহিত হলে উৎপন্ন তাপ (H) এর গাণিতিক সূত্রটি কী?",
+                answer: `
+                    <p>জুলের তিনটি সূত্রকে একত্রিত করলে পাওয়া যায় <strong>H ∝ I²Rt</strong>। যদি H, I, R এবং t সকলেই SI এককে পরিমাপ করা হয়, তাহলে সমানুপাতিক ধ্রুবকটি 1 হয়।</p>
+                    
+                    <p>অতএব, উৎপন্ন তাপের গাণিতিক সূত্রটি হলো:</p>
+                    <div class="formula">H = I²Rt</div>
+                    
+                    <p><strong>এখানে:</strong></p>
+                    <ul>
+                        <li>H = তাপ (জুল বা Joule এ)</li>
+                        <li>I = তড়িৎপ্রবাহ (অ্যাম্পিয়ার বা Ampere এ)</li>
+                        <li>R = রোধ (ওহম বা Ohm এ)</li>
+                        <li>t = সময় (সেকেন্ড বা Second এ)</li>
+                    </ul>
+                `
+            },
+            {
+                id: 4,
+                question: "উৎপন্ন তাপ (H) যদি ক্যালোরিতে পরিমাপ করা হয়, তবে জুলের সূত্রের পরিবর্তিত সূত্রটি কী হবে?",
+                answer: `
+                    <p>যদি উৎপন্ন তাপ (H) ক্যালোরি এককে পরিমাপ করা হয়, তবে জুলের সূত্রের পরিবর্তিত রূপটি হলো:</p>
+                    <div class="formula">H = I²Rt / J</div>
+                    
+                    <p>এখানে, J হলো <strong>তড়িৎশক্তির যান্ত্রিক তুল্যাঙ্ক</strong>।</p>
+                    
+                    <h4>জুল ও ক্যালোরির মধ্যে সম্পর্ক:</h4>
+                    <ul>
+                        <li><strong>1 ক্যালোরি = 4.2 জুল</strong></li>
+                        <li><strong>1 জুল = 0.24 ক্যালোরি</strong></li>
+                    </ul>
+                    
+                    <p>অতএব, ক্যালোরিতে পরিমাপকৃত তাপের সূত্রটি হলো:</p>
+                    <div class="formula">H (ক্যালোরিতে) = 0.24 I²Rt</div>
+                `
+            },
+            {
+                id: 5,
+                question: "ভোল্টেজ (V) এবং তড়িৎপ্রবাহ (I) অথবা ভোল্টেজ (V) এবং রোধ (R) বিবেচনা করে উৎপন্ন তাপ (H) এর বিকল্প সূত্রগুলি কী?",
+                answer: `
+                    <p>আমরা জানি, একটি পরিবাহীর মধ্যে দিয়ে Q পরিমাণ আধানকে V বিভব পার্থক্য অতিক্রম করাতে কৃতকার্য W = VQ।</p>
+                    
+                    <p>যেহেতু Q = It (Q হলো আধান, I তড়িৎপ্রবাহ, t সময়), তাই কৃতকার্য W = VIt।</p>
+                    
+                    <p>যেহেতু এই কৃতকার্যই তাপে রূপান্তরিত হয় (W = H), অতএব:</p>
+                    <div class="formula">H = VIt</div>
+                    
+                    <p>ও'মের সূত্র অনুযায়ী, V = IR। এই সম্পর্ক ব্যবহার করে আরও দুটি সূত্র পাওয়া যায়:</p>
+                    
+                    <h4>১. H = I²Rt:</h4>
+                    <p>H = VIt সূত্রে V-এর পরিবর্তে IR বসালে, H = (IR)It = I²Rt পাওয়া যায়। (এটি জুলের মূল সূত্র)</p>
+                    
+                    <h4>২. H = V²t/R:</h4>
+                    <p>H = VIt সূত্রে I-এর পরিবর্তে V/R বসালে, H = V(V/R)t = V²t/R পাওয়া যায়।</p>
+                    
+                    <p><strong>অতএব, উৎপন্ন তাপের বিকল্প সূত্রগুলি হলো:</strong></p>
+                    <div class="formula">H = VIt এবং H = V²t/R</div>
+                `
+            },
+            {
+                id: 6,
+                question: "তড়িৎপ্রবাহের তাপীয় ফলের ব্যবহার করে এমন কয়েকটি গার্হস্থ্য প্রয়োগের উদাহরণ দিন।",
+                answer: `
+                    <p>তড়িৎপ্রবাহের তাপীয় ফল ব্যবহার করে এমন কয়েকটি গার্হস্থ্য সরঞ্জাম বা যন্ত্র হলো:</p>
+                    
+                    <ul>
+                        <li><strong>বৈদ্যুতিক ইস্ত্রি (Electric Iron):</strong> এর মধ্যে উত্তাপক কুন্ডলী (heating coil) থাকে যা তড়িৎপ্রবাহে উত্তপ্ত হয়।</li>
+                        
+                        <li><strong>বৈদ্যুতিক হিটার (Electric Heater):</strong> এটিও একটি নিক্রোম তারের কুন্ডলী ব্যবহার করে যা তড়িৎপ্রবাহের প্রভাবে তাপ উৎপন্ন করে এবং পরিবেশকে উত্তপ্ত করে।</li>
+                        
+                        <li><strong>বৈদ্যুতিক বাতি (Electric Bulb):</strong> এর ফিলামেন্ট তড়িৎপ্রবাহে উত্তপ্ত হয়ে আলো দেয়।</li>
+                        
+                        <li><strong>বৈদ্যুতিক ফিউজ (Electric Fuse):</strong> এটি তড়িৎপ্রবাহের তাপীয় ফলের উপর ভিত্তি করে কাজ করে এবং বর্তনীকে অতিরিক্ত তড়িৎপ্রবাহ থেকে রক্ষা করে।</li>
+                        
+                        <li><strong>বৈদ্যুতিক কেটলি (Electric Kettle):</strong> পানি গরম করার জন্য ব্যবহৃত হয়।</li>
+                        
+                        <li><strong>টোস্টার (Toaster):</strong> রুটি সেঁকার জন্য ব্যবহৃত হয়।</li>
+                    </ul>
+                `
+            },
+            {
+                id: 7,
+                question: "বৈদ্যুতিক হিটার বা ইস্ত্রিগুলিতে উত্তাপক তার হিসাবে কেন নাইক্রোম ব্যবহার করা হয়?",
+                answer: `
+                    <p>বৈদ্যুতিক হিটার বা ইস্ত্রিগুলিতে উত্তাপক তার হিসাবে <strong>নিক্রোম (Nichrome)</strong> (যা নিকেল, ক্রোমিয়াম, লোহা এবং ম্যাঙ্গানিজের সংকর ধাতু) ব্যবহার করা হয়।</p>
+                    
+                    <h4>নিক্রোম ব্যবহারের কারণসমূহ:</h4>
+                    
+                    <ul>
+                        <li><strong>উচ্চ রোধাঙ্ক (High Resistivity):</strong> নাইক্রোমের রোধাঙ্ক অনেক বেশি। এর ফলে একই তড়িৎপ্রবাহে এটি প্রচুর তাপ উৎপন্ন করে (H = I²Rt সূত্রানুযায়ী)।</li>
+                        
+                        <li><strong>উচ্চ গলনাঙ্ক (High Melting Point):</strong> নাইক্রোমের গলনাঙ্ক অনেক বেশি (প্রায় ১৪০০°C), তাই উচ্চ তাপমাত্রায় এটি গলে যায় না।</li>
+                        
+                        <li><strong>উচ্চ উষ্ণতা সহায়ক (High Thermal Endurance):</strong> উচ্চ তাপমাত্রায়ও নাইক্রোম বাতাসের অক্সিজেন দ্বারা সহজে জারিত হয় না এবং এর ভৌত বৈশিষ্ট্য অক্ষুণ্ণ থাকে।</li>
+                        
+                        <li><strong>দীর্ঘস্থায়ী (Durable):</strong> নিক্রোম তার দীর্ঘদিন ব্যবহারের পর ও কার্যকর থাকে।</li>
+                    </ul>
+                `
+            },
+            {
+                id: 8,
+                question: "একটি সাধারণ বৈদ্যুতিক বাতিতে ফিলামেন্টের জন্য কী উপাদান ব্যবহার করা হয় এবং তাপীয় ফলের পরিপ্রেক্ষিতে এর ভৌত গঠন কেন গুরুত্বপূর্ণ?",
+                answer: `
+                    <p>একটি সাধারণ বৈদ্যুতিক বাতিতে (Incandescent electric bulb) ফিলামেন্টের জন্য সাধারণত <strong>টাংস্টেন (Tungsten)</strong> ধাতু ব্যবহার করা হয়।</p>
+                    
+                    <h4>ফিলামেন্টের ভৌত গঠনের গুরুত্ব:</h4>
+                    
+                    <p>ফিলামেন্টের ভৌত গঠন (খুব সরু ও লম্বা) তাপীয় ফলের পরিপ্রেক্ষিতে অত্যন্ত গুরুত্বপূর্ণ:</p>
+                    
+                    <ul>
+                        <li><strong>লম্বা (Long):</strong> পরিবাহীর রোধ তার দৈর্ঘ্যের সমানুপাতিক (R ∝ L)। ফিলামেন্ট লম্বা হওয়ার কারণে এর রোধ বেশি হয়।</li>
+                        
+                        <li><strong>সরু (Thin):</strong> পরিবাহীর রোধ তার প্রস্থচ্ছেদ ক্ষেত্রফলের ব্যস্তানুপাতিক (R ∝ 1/A)। ফিলামেন্ট সরু হওয়ার কারণে এর প্রস্থচ্ছেদ ক্ষেত্রফল কম হয়, ফলে রোধ আরও বেশি হয়।</li>
+                        
+                        <li><strong>উচ্চ রোধের গুরুত্ব:</strong> ফিলামেন্টটি খুব সরু ও লম্বা হওয়ার কারণে এর <strong>রোধ খুব বেশি</strong> হয়। জুলের সূত্র (H = I²Rt) অনুযায়ী, রোধ বেশি হলে একই তড়িৎপ্রবাহে অধিক তাপ উৎপন্ন হয়।</li>
+                        
+                        <li><strong>আলো উৎপাদন:</strong> এই বিপুল পরিমাণ তাপের কারণে টাংস্টেন ফিলামেন্ট <strong>শ্বেততপ্ত</strong> হয়ে আলো বিকিরণ করে।</li>
+                    </ul>
+                `
+            }
+        ];
+
+        let currentQuestion = null;
+        let answeredQuestions = new Set();
+
+        function initializeQuestions() {
+            const questionGrid = document.getElementById('questionGrid');
+            questionGrid.innerHTML = '';
+            
+            questions.forEach(q => {
+                const questionCard = document.createElement('button');
+                questionCard.className = 'question-card';
+                questionCard.onclick = () => showAnswer(q.id);
+                
+                questionCard.innerHTML = `
+                    <div class="question-number">প্রশ্ন ${q.id}</div>
+                    <div class="question-text">${q.question}</div>
+                `;
+                
+                questionGrid.appendChild(questionCard);
+            });
+        }
+
+        function showAnswer(questionId) {
+            const question = questions.find(q => q.id === questionId);
+            if (!question) return;
+
+            // Update answered questions
+            answeredQuestions.add(questionId);
+            updateProgress();
+
+            // Update active question
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.target.closest('.question-card').classList.add('active');
+
+            // Show answer
+            const answerSection = document.getElementById('answerSection');
+            const answerTitle = document.getElementById('answerTitle');
+            const answerContent = document.getElementById('answerContent');
+
+            answerTitle.textContent = `প্রশ্ন ${question.id}: ${question.question}`;
+            answerContent.innerHTML = question.answer;
+
+            answerSection.classList.add('show');
+            
+            // Smooth scroll to answer
+            answerSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const percentage = (answeredQuestions.size / questions.length) * 100;
+            progressFill.style.width = percentage + '%';
+        }
+
+        function clearAnswer() {
+            const answerSection = document.getElementById('answerSection');
+            answerSection.classList.remove('show');
+            
+            // Remove active state from all question cards
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeQuestions();
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key >= '1' && e.key <= '8') {
+                const questionId = parseInt(e.key);
+                showAnswer(questionId);
+            } else if (e.key === 'Escape') {
+                clearAnswer();
+            }
+        });
+    </script>
+</body>
+</html>
