@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>চলতড়িৎ ও তাপীয় ফল - ইন্টারেক্টিভ অ্যানিমেশন</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .control-panel {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .tab.active {
+            background: linear-gradient(45deg, #fa709a 0%, #fee140 100%);
+            transform: translateY(-2px);
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animation-area {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+
+        .circuit {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            border: 3px solid #333;
+            border-radius: 10px;
+            margin: 20px 0;
+            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%);
+            background-size: 20px 20px;
+            overflow: hidden;
+        }
+
+        .wire {
+            position: absolute;
+            background: #8B4513;
+            border-radius: 5px;
+        }
+
+        .horizontal-wire {
+            width: 80%;
+            height: 8px;
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+        }
+
+        .vertical-wire-left {
+            width: 8px;
+            height: 40%;
+            left: 10%;
+            top: 30%;
+        }
+
+        .vertical-wire-right {
+            width: 8px;
+            height: 40%;
+            right: 10%;
+            top: 30%;
+        }
+
+        .battery {
+            position: absolute;
+            left: 5%;
+            top: 40%;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .resistor {
+            position: absolute;
+            right: 5%;
+            top: 40%;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #3742fa, #2f3542);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .electron {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, #00d4ff, #0077ff);
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00d4ff;
+            animation: moveElectron 3s linear infinite;
+        }
+
+        @keyframes moveElectron {
+            0% { left: 10%; top: 46%; }
+            25% { left: 85%; top: 46%; }
+            50% { left: 85%; top: 66%; }
+            75% { left: 15%; top: 66%; }
+            100% { left: 10%; top: 46%; }
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .value-display {
+            margin-top: 10px;
+            padding: 10px;
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .heating-demo {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to right, #74b9ff, #0984e3);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .heating-element {
+            position: absolute;
+            width: 80%;
+            height: 20px;
+            background: #2d3436;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .heat-particles {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #ff7675, #d63031);
+            border-radius: 50%;
+            animation: heatRise 2s ease-out infinite;
+        }
+
+        @keyframes heatRise {
+            0% { 
+                transform: translateY(0) scale(0.5);
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(-100px) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .appliance-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .appliance {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .appliance:hover {
+            transform: translateY(-5px);
+        }
+
+        .appliance-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: white;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+        }
+
+        .formula-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .formula {
+            font-size: 1.5em;
+            text-align: center;
+            margin: 10px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .info-box {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .appliance-demo {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>চলতড়িৎ ও তাপীয় ফল</h1>
+            <p>ইন্টারেক্টিভ অ্যানিমেশন ও সিমুলেশন</p>
+        </div>
+
+        <div class="control-panel">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('basics')">মৌলিক ধারণা</button>
+                <button class="tab" onclick="showTab('heating')">তাপীয় ফল</button>
+                <button class="tab" onclick="showTab('applications')">ব্যবহারিক প্রয়োগ</button>
+            </div>
+
+            <div id="basics" class="content active">
+                <div class="animation-area">
+                    <h3>চলতড়িতের মৌলিক ধারণা</h3>
+                    <div class="circuit">
+                        <div class="wire horizontal-wire"></div>
+                        <div class="wire vertical-wire-left"></div>
+                        <div class="wire vertical-wire-right"></div>
+                        <div class="battery">ব্যাটারি<br>+/-</div>
+                        <div class="resistor">রোধক<br>R</div>
+                        <div class="electron" id="electron1"></div>
+                        <div class="electron" id="electron2" style="animation-delay: 0.5s;"></div>
+                        <div class="electron" id="electron3" style="animation-delay: 1s;"></div>
+                        <div class="electron" id="electron4" style="animation-delay: 1.5s;"></div>
+                        <div class="electron" id="electron5" style="animation-delay: 2s;"></div>
+                    </div>
+
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="voltage">বিভবপার্থক্য (V): <span id="voltageValue">5</span>V</label>
+                            <input type="range" id="voltage" class="slider" min="1" max="12" value="5">
+                            <div class="value-display">
+                                উচ্চ বিভব থেকে নিম্ন বিভবে আধান প্রবাহিত হয়
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label for="resistance">রোধ (Ω): <span id="resistanceValue">10</span>Ω</label>
+                            <input type="range" id="resistance" class="slider" min="1" max="50" value="10">
+                            <div class="value-display">
+                                তড়িৎপ্রবাহ: <span id="currentValue">0.5</span>A
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>মূল ধারণা:</h4>
+                        <ul>
+                            <li><strong>তড়িৎপ্রবাহ:</strong> আধানের প্রবাহ (ইলেকট্রনের গতি)</li>
+                            <li><strong>বিভবপার্থক্য:</strong> তড়িৎপ্রবাহের চালিকাশক্তি</li>
+                            <li><strong>রোধ:</strong> প্রবাহের বাধা</li>
+                            <li><strong>ওহমের সূত্র:</strong> V = I × R</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="heating" class="content">
+                <div class="animation-area">
+                    <h3>তড়িৎপ্রবাহের তাপীয় ফল</h3>
+                    
+                    <div class="heating-demo" id="heatingDemo">
+                        <div class="heating-element" id="heatingElement"></div>
+                    </div>
+
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="current">তড়িৎপ্রবাহ (A): <span id="currentVal">2</span>A</label>
+                            <input type="range" id="current" class="slider" min="1" max="10" value="2">
+                        </div>
+                        <div class="control-group">
+                            <label for="resistance2">রোধ (Ω): <span id="resistanceVal">5</span>Ω</label>
+                            <input type="range" id="resistance2" class="slider" min="1" max="20" value="5">
+                        </div>
+                        <div class="control-group">
+                            <label for="time">সময় (s): <span id="timeVal">3</span>s</label>
+                            <input type="range" id="time" class="slider" min="1" max="10" value="3">
+                        </div>
+                    </div>
+
+                    <div class="formula-box">
+                        <h4>জুলের সূত্র:</h4>
+                        <div class="formula">H = I²Rt</div>
+                        <div class="value-display">
+                            উৎপন্ন তাপ: <span id="heatGenerated">60</span> জুল
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>তাপ সৃষ্টির কারণ:</h4>
+                        <p>ইলেকট্রনগুলি পরমাণুর সাথে সংঘর্ষ করে তাদের গতিশক্তি স্থানান্তরিত করে। এতে পরমাণুর কম্পন বৃদ্ধি পায় এবং তাপ উৎপন্ন হয়।</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="applications" class="content">
+                <div class="animation-area">
+                    <h3>তাপীয় ফলের ব্যবহারিক প্রয়োগ</h3>
+                    
+                    <div class="appliance-demo">
+                        <div class="appliance" onclick="showAppliance('iron')">
+                            <div class="appliance-icon">🔥</div>
+                            <h4>বৈদ্যুতিক ইস্ত্রি</h4>
+                            <p>নাইক্রোম তার ব্যবহার করে তাপ উৎপাদন</p>
+                        </div>
+                        <div class="appliance" onclick="showAppliance('bulb')">
+                            <div class="appliance-icon">💡</div>
+                            <h4>বৈদ্যুতিক বাল্ব</h4>
+                            <p>টাংস্টেন ফিলামেন্ট থেকে আলো</p>
+                        </div>
+                        <div class="appliance" onclick="showAppliance('fuse')">
+                            <div class="appliance-icon">⚡</div>
+                            <h4>বৈদ্যুতিক ফিউজ</h4>
+                            <p>নিরাপত্তার জন্য কম গলনাঙ্ক</p>
+                        </div>
+                        <div class="appliance" onclick="showAppliance('heater')">
+                            <div class="appliance-icon">🔥</div>
+                            <h4>বৈদ্যুতিক হিটার</h4>
+                            <p>উচ্চ রোধাঙ্ক দিয়ে তাপ সৃষ্টি</p>
+                        </div>
+                    </div>
+
+                    <div id="applianceDetails" class="info-box" style="display: none;">
+                        <h4 id="applianceTitle">যন্ত্রের বিস্তারিত</h4>
+                        <p id="applianceDescription">একটি যন্ত্র নির্বাচন করুন</p>
+                        <div id="applianceSpecs"></div>
+                    </div>
+
+                    <button class="btn" onclick="startDemo()">ডেমো শুরু করুন</button>
+                    <button class="btn" onclick="resetDemo()">রিসেট করুন</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let heatParticles = [];
+        let demoActive = false;
+
+        function showTab(tabName) {
+            // Hide all content
+            const contents = document.querySelectorAll('.content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function updateBasics() {
+            const voltage = document.getElementById('voltage').value;
+            const resistance = document.getElementById('resistance').value;
+            const current = (voltage / resistance).toFixed(2);
+            
+            document.getElementById('voltageValue').textContent = voltage;
+            document.getElementById('resistanceValue').textContent = resistance;
+            document.getElementById('currentValue').textContent = current;
+            
+            // Update electron speed based on current
+            const electrons = document.querySelectorAll('.electron');
+            electrons.forEach(electron => {
+                electron.style.animationDuration = (5 / current) + 's';
+            });
+        }
+
+        function updateHeating() {
+            const current = document.getElementById('current').value;
+            const resistance = document.getElementById('resistance2').value;
+            const time = document.getElementById('time').value;
+            const heat = (current * current * resistance * time);
+            
+            document.getElementById('currentVal').textContent = current;
+            document.getElementById('resistanceVal').textContent = resistance;
+            document.getElementById('timeVal').textContent = time;
+            document.getElementById('heatGenerated').textContent = heat;
+            
+            // Update heating element color based on heat
+            const heatingElement = document.getElementById('heatingElement');
+            const intensity = Math.min(heat / 200, 1);
+            heatingElement.style.background = `linear-gradient(45deg, 
+                hsl(${60 - intensity * 60}, 100%, ${50 + intensity * 30}%), 
+                hsl(${30 - intensity * 30}, 100%, ${60 + intensity * 20}%))`;
+            
+            // Create heat particles
+            createHeatParticles(intensity);
+        }
+
+        function createHeatParticles(intensity) {
+            const demo = document.getElementById('heatingDemo');
+            const particleCount = Math.floor(intensity * 10);
+            
+            // Clear existing particles
+            const existingParticles = demo.querySelectorAll('.heat-particles');
+            existingParticles.forEach(particle => particle.remove());
+            
+            // Create new particles
+            for (let i = 0; i < particleCount; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'heat-particles';
+                    particle.style.left = Math.random() * 80 + 10 + '%';
+                    particle.style.bottom = '45%';
+                    particle.style.animationDelay = Math.random() * 2 + 's';
+                    demo.appendChild(particle);
+                    
+                    // Remove particle after animation
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 2000);
+                }, i * 200);
+            }
+        }
+
+        function showAppliance(type) {
+            const details = document.getElementById('applianceDetails');
+            const title = document.getElementById('applianceTitle');
+            const description = document.getElementById('applianceDescription');
+            const specs = document.getElementById('applianceSpecs');
+            
+            details.style.display = 'block';
+            
+            switch(type) {
+                case 'iron':
+                    title.textContent = 'বৈদ্যুতিক ইস্ত্রি';
+                    description.textContent = 'নাইক্রোম তারের কুণ্ডলী উত্তপ্ত হয়ে কাপড় ইস্ত্রি করার জন্য প্রয়োজনীয় তাপ সরবরাহ করে।';
+                    specs.innerHTML = `
+                        <strong>বৈশিষ্ট্য:</strong><br>
+                        • নাইক্রোম তার (উচ্চ রোধাঙ্ক)<br>
+                        • উচ্চ গলনাঙ্ক (১৪০০°C)<br>
+                        • তাপ নিরোধক আবরণ<br>
+                        • শক্তি: ৭৫০-১৫০০ ওয়াট
+                    `;
+                    break;
+                case 'bulb':
+                    title.textContent = 'বৈদ্যুতিক বাল্ব';
+                    description.textContent = 'টাংস্টেন ফিলামেন্ট অত্যধিক উত্তপ্ত হয়ে আলো বিকিরণ করে। নিষ্ক্রিয় গ্যাস ফিলামেন্ট রক্ষা করে।';
+                    specs.innerHTML = `
+                        <strong>বৈশিষ্ট্য:</strong><br>
+                        • টাংস্টেন ফিলামেন্ট<br>
+                        • গলনাঙ্ক: ৩৬৯৫°C<br>
+                        • নিষ্ক্রিয় গ্যাস (আর্গন/নাইট্রোজেন)<br>
+                        • শক্তি: ৪০-১০০ ওয়াট
+                    `;
+                    break;
+                case 'fuse':
+                    title.textContent = 'বৈদ্যুতিক ফিউজ';
+                    description.textContent = 'কম গলনাঙ্কের তার অতিরিক্ত প্রবাহে গলে যায় এবং বর্তনী ছিন্ন করে সুরক্ষা প্রদান করে।';
+                    specs.innerHTML = `
+                        <strong>বৈশিষ্ট্য:</strong><br>
+                        • কম গলনাঙ্ক (২৩২°C - টিন)<br>
+                        • দ্রুত গলনের হার<br>
+                        • নিরাপত্তা সুইচ<br>
+                        • রেটিং: ৫A-৩০A
+                    `;
+                    break;
+                case 'heater':
+                    title.textContent = 'বৈদ্যুতিক হিটার';
+                    description.textContent = 'উচ্চ রোধাঙ্কের তার দিয়ে তৈরি কুণ্ডলী থেকে তাপ উৎপাদন করে ঘর গরম করা হয়।';
+                    specs.innerHTML = `
+                        <strong>বৈশিষ্ট্য:</strong><br>
+                        • নাইক্রোম/কার্বন ফাইবার<br>
+                        • উচ্চ রোধাঙ্ক<br>
+                        • তাপ বিকিরণকারী<br>
+                        • শক্তি: ১০০০-২০০০ ওয়াট
+                    `;
+                    break;
+            }
+        }
+
+        function startDemo() {
+            demoActive = true;
+            const appliances = document.querySelectorAll('.appliance');
+            appliances.forEach(appliance => {
+                appliance.classList.add('pulse');
+            });
+            
+            // Start heating effect
+            updateHeating();
+            
+            setTimeout(() => {
+                if (demoActive) {
+                    createHeatParticles(0.8);
+                }
+            }, 1000);
+        }
+
+        function resetDemo() {
+            demoActive = false;
+            const appliances = document.querySelectorAll('.appliance');
+            appliances.forEach(appliance => {
+                appliance.classList.remove('pulse');
+            });
+            
+            // Reset heating element
+            const heatingElement = document.getElementById('heatingElement');
+            heatingElement.style.background = '#2d3436';
+            
+            // Clear heat particles
+            const demo = document.getElementById('heatingDemo');
+            const particles = demo.querySelectorAll('.heat-particles');
+            particles.forEach(particle => particle.remove());
+            
+            // Reset sliders
+            document.getElementById('current').value = 2;
+            document.getElementById('resistance2').value = 5;
+            document.getElementById('time').value = 3;
+            document.getElementById('voltage').value = 5;
+            document.getElementById('resistance').value = 10;
+            
+            // Update displays
+            updateBasics();
+            updateHeating();
+        }
+
+        // Event listeners
+        document.getElementById('voltage').addEventListener('input', updateBasics);
+        document.getElementById('resistance').addEventListener('input', updateBasics);
+        document.getElementById('current').addEventListener('input', updateHeating);
+        document.getElementById('resistance2').addEventListener('input', updateHeating);
+        document.getElementById('time').addEventListener('input', updateHeating);
+
+        // Initialize
+        updateBasics();
+        updateHeating();
+
+        // Auto-demo for heating effect
+        setInterval(() => {
+            if (demoActive) {
+                createHeatParticles(0.6);
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
