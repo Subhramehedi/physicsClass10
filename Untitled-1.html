@@ -321,15 +321,16 @@
     </div>
 
     <div class="physics-info">
-      <strong>Right-Hand Thumb Rule:</strong> Point your thumb in the direction
+      <!--<strong>Right-Hand Thumb Rule:</strong> Point your thumb in the direction
       of current, your fingers curl in the direction of magnetic field
-    </div>
+    </div> -->
 
     <div class="instructions">
       <p>
-        • Drag to rotate the scene<br />
+        <!-- • Drag to rotate the scene<br />
         • Scroll to zoom in/out<br />
         • Use controls to manage experiment
+      </p> -->
       </p>
     </div>
 
@@ -437,8 +438,8 @@
 
         // Create arrow shape
         const arrowShape = new THREE.Shape();
-        arrowShape.moveTo(-0.5, 0);
-        arrowShape.lineTo(0.5, 0);
+        arrowShape.moveTo(-0.5, -0);
+        arrowShape.lineTo(0.5, -0);
         arrowShape.lineTo(0.3, 0.2);
         arrowShape.lineTo(0.5, 0);
         arrowShape.lineTo(0.3, -0.2);
@@ -590,9 +591,11 @@
 
         const northHalf = new THREE.Mesh(needleGeometry, northMaterial);
         northHalf.position.x = 0.9;
+        northHalf.position.y = 0.9;
 
         const southHalf = new THREE.Mesh(needleGeometry, southMaterial);
         southHalf.position.x = -0.9;
+        southHalf.position.y = 0.9;
 
         needleGroup.add(northHalf);
         needleGroup.add(southHalf);
@@ -633,16 +636,16 @@
           group.add(label);
         };
 
-        createCompassLabel("N", "#ff416c", new THREE.Vector3(0, 0.1, -1.1), 0);
-        createCompassLabel("S", "#2193b0", new THREE.Vector3(0, 0.1, 1.1), 0);
+        createCompassLabel("W", "#ff416c", new THREE.Vector3(0, 0.1, -1.1), 0);
+        createCompassLabel("E", "#2193b0", new THREE.Vector3(0, 0.1, 1.1), 0);
         createCompassLabel(
-          "W",
+          "S",
           "#ffffff",
           new THREE.Vector3(-1.1, 0.1, 0),
           Math.PI / 2
         );
         createCompassLabel(
-          "E",
+          "N",
           "#ffffff",
           new THREE.Vector3(1.1, 0.1, 0),
           Math.PI / 2
