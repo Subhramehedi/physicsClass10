@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Electromagnetism Animation</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+        font-family: "Arial", sans-serif;
+        color: #fff;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        background: linear-gradient(45deg, #ff6b35, #f7931e, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: glow 2s ease-in-out infinite alternate;
+      }
+
+      @keyframes glow {
+        from {
+          filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.5));
+        }
+        to {
+          filter: drop-shadow(0 0 20px rgba(255, 107, 53, 0.8));
+        }
+      }
+
+      .experiment-container {
+        display: none;
+        background: rgba(20, 20, 40, 0.8);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 20px;
+        border: 2px solid #4a90e2;
+        box-shadow: 0 0 30px rgba(74, 144, 226, 0.3);
+      }
+
+      .experiment-container.active {
+        display: block;
+        animation: fadeInScale 0.8s ease-out;
+      }
+
+      @keyframes fadeInScale {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .controls {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .nav-btn {
+        background: linear-gradient(45deg, #4a90e2, #357abd);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        margin: 0 10px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+      }
+
+      .nav-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(74, 144, 226, 0.5);
+      }
+
+      .nav-btn.active {
+        background: linear-gradient(45deg, #ff6b35, #f7931e);
+        box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+      }
+
+      .canvas-container {
+        position: relative;
+        margin: 20px auto;
+        border: 2px solid #4a90e2;
+        border-radius: 10px;
+        background: radial-gradient(circle at center, #001122, #000);
+        overflow: hidden;
+      }
+
+      canvas {
+        display: block;
+        background: transparent;
+      }
+
+      .description {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .control-panel {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+
+      .control-btn {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .control-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+      }
+
+      .slider-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 10px 0;
+      }
+
+      .slider {
+        -webkit-appearance: none;
+        width: 200px;
+        height: 8px;
+        border-radius: 5px;
+        background: #333;
+        outline: none;
+      }
+
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #4a90e2;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="header">⚡ ELECTROMAGNETISM EXPLORER ⚡</h1>
+
+      <div class="controls">
+        <button class="nav-btn active" onclick="showExperiment(0)">
+          Oersted's Experiment
+        </button>
+        <button class="nav-btn" onclick="showExperiment(1)">
+          Ampere's Swimming Rule
+        </button>
+        <button class="nav-btn" onclick="showExperiment(2)">
+          Right-Hand Grip Rule
+        </button>
+        <button class="nav-btn" onclick="showExperiment(3)">
+          Magnetic Field - Coil
+        </button>
+        <button class="nav-btn" onclick="showExperiment(4)">
+          Solenoid Field
+        </button>
+        <button class="nav-btn" onclick="showExperiment(5)">
+          Fleming's Left Hand
+        </button>
+        <button class="nav-btn" onclick="showExperiment(6)">
+          Barlow's Wheel
+        </button>
+      </div>
+
+      <!-- Oersted's Experiment -->
+      <div class="experiment-container active" id="experiment-0">
+        <h2>🧭 Oersted's Experiment</h2>
+        <div class="canvas-container">
+          <canvas id="oersted-canvas" width="800" height="400"></canvas>
+        </div>
+        <div class="control-panel">
+          <button class="control-btn" onclick="toggleCurrent(0)">
+            Toggle Current
+          </button>
+          <div class="slider-container">
+            <label>Current: </label>
+            <input
+              type="range"
+              class="slider"
+              min="0"
+              max="100"
+              value="50"
+              onchange="updateCurrent(0, this.value)"
+            />
+            <span id="current-0">5.0A</span>
+          </div>
+        </div>
+        <div class="description">
+          <p>
+            <strong>Oersted's Discovery (1820):</strong> When electric current
+            flows through a wire, it creates a magnetic field around it, causing
+            nearby compass needles to deflect. This was the first demonstration
+            that electricity and magnetism are related.
+          </p>
+        </div>
+      </div>
+
+      <!-- Ampere's Swimming Rule -->
+      <div class="experiment-container" id="experiment-1">
+        <h2>🏊 Ampere's Swimming Rule</h2>
+        <div class="canvas-container">
+          <canvas id="ampere-canvas" width="800" height="400"></canvas>
+        </div>
+        <div class="control-panel">
+          <button class="control-btn" onclick="toggleCurrent(1)">
+            Toggle Current Direction
+          </button>
+          <button class="control-btn" onclick="toggleSwimmer()">
+            Show/Hide Swimmer
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            <strong>Ampere's Swimming Rule:</strong> Imagine swimming along the
+            wire in the direction of current flow. The magnetic field will
+            deflect the north pole of a compass to your left. This helps
+            determine the direction of the magnetic field around a
+            current-carrying conductor.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right-Hand Grip Rule -->
+      <div class="experiment-container" id="experiment-2">
+        <h2>👋 Right-Hand Grip Rule</h2>
+        <div class="canvas-container">
+          <canvas id="righthand-canvas" width="800" height="400"></canvas>
+        </div>
+        <div class="control-panel">
+          <button class="control-btn" onclick="toggleCurrent(2)">
+            Reverse Current
+          </button>
+          <button class="control-btn" onclick="toggleHand()">
+            Show/Hide Hand
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            <strong>Right-Hand Grip Rule:</strong> Point your right thumb in the
+            direction of current flow, and curl your fingers around the wire.
+            Your fingers show the direction of the circular magnetic field lines
+            around the conductor.
+          </p>
+        </div>
+      </div>
+
+      <!-- Magnetic Field - Coil -->
+      <div class="experiment-container" id="experiment-3">
+        <h2>🌀 Magnetic Field of a Coil</h2>
+        <div class="canvas-container">
+          <canvas id="coil-canvas" width="800" height="400"></canvas>
+        </div>
+        <div class="control-panel">
+          <button class="control-btn" onclick="toggleCurrent(3)">
+            Toggle Current
+          </button>
+          <div class="slider-container">
+            <label>Turns: </label>
+            <input
+              type="range"
+              class="slider"
+              min="1"
+              max="10"
+              value="5"
+              onchange="updateTurns(this.value)"
+            />
+            <span id="turns">5</span>
+          </div>
+        </div>
+        <div class="description">
+          <p>
+            <strong>Electromagnetic Coil:</strong> When current flows through a
+            coil, it creates a magnetic field similar to a bar magnet. The field
+            strength increases with more turns and higher current. The coil acts
+            like a temporary electromagnet.
+          </p>
+        </div>
+      </div>
+
+      <!-- Solenoid Field -->
+      <div class="experiment-container" id="experiment-4">
+        <h2>🔋 Solenoid Magnetic Field</h2>
+        <div class="canvas-container">
+          <canvas id="solenoid-canvas" width="800" height="400"></canvas>
+        </div>
+        <div class="control-panel">
+          <button class="control-btn" onclick="toggleCurrent(4)">
+            Toggle Current
+          </button>
+          <button class="control-btn" onclick="addCore()">Add Iron Core</button>
+        </div>
+        <div class="description">
+          <p>
+            <strong>Solenoid:</strong> A solenoid is a long coil of wire. When
+            current flows through it, it creates a uniform magnetic field
+            inside, similar to a bar magnet. Adding an iron core greatly
+            increases the magnetic field strength.
+          </p>
+        </div>
+      </div>
+
+      <!-- Fleming's Left Hand Rule -->
+      <div class="experiment-container" id="experiment-5">
+        <h2>✋ Fleming's Left Hand Rule</h2>
+        <div class="canvas-container">
+          <canvas id="fleming-canvas" width="800" height="400"></canvas>
+        </div>
+        <div class="control-panel">
+          <button class="control-btn" onclick="toggleCurrent(5)">
+            Reverse Current
+          </button>
+          <button class="control-btn" onclick="toggleField()">
+            Reverse Magnetic Field
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            <strong>Fleming's Left Hand Rule:</strong> Used to find the
+            direction of force on a current-carrying conductor in a magnetic
+            field. Thumb = Force, First finger = Field, Middle finger = Current.
+            When all three are perpendicular, they show the motor effect.
+          </p>
+        </div>
+      </div>
+
+      <!-- Barlow's Wheel -->
+      <div class="experiment-container" id="experiment-6">
+        <h2>⚙️ Barlow's Wheel</h2>
+        <div class="canvas-container">
+          <canvas id="barlow-canvas" width="800" height="400"></canvas>
+        </div>
+        <div class="control-panel">
+          <button class="control-btn" onclick="toggleCurrent(6)">
+            Start/Stop Motor
+          </button>
+          <button class="control-btn" onclick="reverseRotation()">
+            Reverse Direction
+          </button>
+          <div class="slider-container">
+            <label>Speed: </label>
+            <input
+              type="range"
+              class="slider"
+              min="1"
+              max="10"
+              value="3"
+              onchange="updateSpeed(this.value)"
+            />
+            <span id="speed">3</span>
+          </div>
+        </div>
+        <div class="description">
+          <p>
+            <strong>Barlow's Wheel:</strong> An early demonstration of the motor
+            principle. A metal wheel with current flowing radially through it
+            rotates in a magnetic field due to the motor effect. This shows how
+            electrical energy converts to mechanical motion.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global variables for animations
+      let currentExperiment = 0;
+      let animationFrames = {};
+      let experimentStates = {
+        0: { currentOn: true, current: 5.0 },
+        1: { currentDirection: 1, showSwimmer: false },
+        2: { currentDirection: 1, showHand: false },
+        3: { currentOn: true, turns: 5 },
+        4: { currentOn: true, hasCore: false },
+        5: { currentDirection: 1, fieldDirection: 1 },
+        6: { motorOn: false, speed: 3, direction: 1, angle: 0 },
+      };
+
+      // Canvas contexts
+      const canvases = {};
+      const contexts = {};
+
+      function initCanvases() {
+        const canvasIds = [
+          "oersted-canvas",
+          "ampere-canvas",
+          "righthand-canvas",
+          "coil-canvas",
+          "solenoid-canvas",
+          "fleming-canvas",
+          "barlow-canvas",
+        ];
+        canvasIds.forEach((id, index) => {
+          canvases[index] = document.getElementById(id);
+          contexts[index] = canvases[index].getContext("2d");
+        });
+        startAnimations();
+      }
+
+      function showExperiment(index) {
+        document
+          .querySelectorAll(".experiment-container")
+          .forEach((container) => {
+            container.classList.remove("active");
+          });
+        document.querySelectorAll(".nav-btn").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+
+        document.getElementById(`experiment-${index}`).classList.add("active");
+        document.querySelectorAll(".nav-btn")[index].classList.add("active");
+        currentExperiment = index;
+      }
+
+      function drawCompass(ctx, x, y, angle, size = 20) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+
+        // Compass body
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(0, 0, size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#333";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // North pointer (red)
+        ctx.fillStyle = "#ff4444";
+        ctx.beginPath();
+        ctx.moveTo(0, -size + 5);
+        ctx.lineTo(-5, -5);
+        ctx.lineTo(5, -5);
+        ctx.closePath();
+        ctx.fill();
+
+        // South pointer (white)
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.moveTo(0, size - 5);
+        ctx.lineTo(-5, 5);
+        ctx.lineTo(5, 5);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      function drawMagneticField(ctx, x, y, radius, strength) {
+        const alpha = Math.min(strength / 100, 1);
+        ctx.strokeStyle = `rgba(0, 255, 255, ${alpha})`;
+        ctx.lineWidth = 2;
+
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2;
+          const x1 = x + Math.cos(angle) * (radius - 10);
+          const y1 = y + Math.sin(angle) * (radius - 10);
+          const x2 = x + Math.cos(angle) * (radius + 10);
+          const y2 = y + Math.sin(angle) * (radius + 10);
+
+          ctx.beginPath();
+          ctx.arc(x, y, radius, angle - 0.1, angle + 0.1);
+          ctx.stroke();
+        }
+      }
+
+      // Oersted's Experiment Animation
+      function animateOersted() {
+        const ctx = contexts[0];
+        const state = experimentStates[0];
+
+        ctx.clearRect(0, 0, 800, 400);
+
+        // Draw wire
+        ctx.strokeStyle = "#ffa500";
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(100, 200);
+        ctx.lineTo(700, 200);
+        ctx.stroke();
+
+        // Draw current flow indicators
+        if (state.currentOn) {
+          ctx.fillStyle = "#ffff00";
+          for (let i = 150; i < 650; i += 50) {
+            ctx.beginPath();
+            ctx.arc(i, 190, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Arrow
+            ctx.strokeStyle = "#ffff00";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(i - 10, 190);
+            ctx.lineTo(i + 10, 190);
+            ctx.moveTo(i + 5, 185);
+            ctx.lineTo(i + 10, 190);
+            ctx.lineTo(i + 5, 195);
+            ctx.stroke();
+          }
+        }
+
+        // Draw compasses around the wire
+        const compassPositions = [
+          [400, 100],
+          [500, 120],
+          [300, 120],
+          [400, 300],
+          [500, 280],
+          [300, 280],
+          [200, 200],
+          [600, 200],
+        ];
+
+        compassPositions.forEach(([x, y], index) => {
+          let angle = 0;
+          if (state.currentOn) {
+            // Calculate magnetic field direction based on position relative to wire
+            const dx = x - 400;
+            const dy = y - 200;
+            if (dy < 0) angle = Math.PI / 2; // Above wire
+            else if (dy > 0) angle = -Math.PI / 2; // Below wire
+            else angle = dy > 0 ? Math.PI : 0; // On wire level
+
+            // Add some variation for visual effect
+            angle += Math.sin(Date.now() * 0.003 + index) * 0.1;
+          }
+          drawCompass(ctx, x, y, angle, 15);
+        });
+
+        // Draw magnetic field lines
+        if (state.currentOn) {
+          for (let radius = 50; radius <= 150; radius += 50) {
+            drawMagneticField(ctx, 400, 200, radius, state.current * 10);
+          }
+        }
+      }
+
+      // Ampere's Swimming Rule Animation
+      function animateAmpere() {
+        const ctx = contexts[1];
+        const state = experimentStates[1];
+
+        ctx.clearRect(0, 0, 800, 400);
+
+        // Draw wire
+        ctx.strokeStyle = "#ffa500";
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(100, 200);
+        ctx.lineTo(700, 200);
+        ctx.stroke();
+
+        // Draw current direction
+        const currentDir = state.currentDirection;
+        ctx.strokeStyle = "#ffff00";
+        ctx.lineWidth = 3;
+
+        for (let i = 150; i < 650; i += 80) {
+          ctx.beginPath();
+          if (currentDir > 0) {
+            ctx.moveTo(i - 15, 200);
+            ctx.lineTo(i + 15, 200);
+            ctx.moveTo(i + 10, 195);
+            ctx.lineTo(i + 15, 200);
+            ctx.lineTo(i + 10, 205);
+          } else {
+            ctx.moveTo(i + 15, 200);
+            ctx.lineTo(i - 15, 200);
+            ctx.moveTo(i - 10, 195);
+            ctx.lineTo(i - 15, 200);
+            ctx.lineTo(i - 10, 205);
+          }
+          ctx.stroke();
+        }
+
+        // Draw swimmer if enabled
+        if (state.showSwimmer) {
+          const swimmerX = 400;
+          const swimmerY = 200;
+
+          ctx.fillStyle = "#ff6b35";
+          ctx.beginPath();
+          ctx.arc(swimmerX, swimmerY - 20, 15, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Body
+          ctx.fillStyle = "#4a90e2";
+          ctx.fillRect(swimmerX - 10, swimmerY - 5, 20, 30);
+
+          // Arms pointing left (magnetic field direction)
+          ctx.strokeStyle = "#fff";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          if (currentDir > 0) {
+            ctx.moveTo(swimmerX - 10, swimmerY + 5);
+            ctx.lineTo(swimmerX - 25, swimmerY);
+          } else {
+            ctx.moveTo(swimmerX + 10, swimmerY + 5);
+            ctx.lineTo(swimmerX + 25, swimmerY);
+          }
+          ctx.stroke();
+        }
+
+        // Draw compass showing magnetic field direction
+        let compassAngle = currentDir > 0 ? Math.PI / 2 : -Math.PI / 2;
+        drawCompass(ctx, 400, 120, compassAngle, 20);
+
+        // Label
+        ctx.fillStyle = "#fff";
+        ctx.font = "16px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Compass shows field direction", 400, 80);
+      }
+
+      // Right-Hand Grip Rule Animation
+      function animateRightHand() {
+        const ctx = contexts[2];
+        const state = experimentStates[2];
+
+        ctx.clearRect(0, 0, 800, 400);
+
+        // Draw wire (vertical)
+        ctx.strokeStyle = "#ffa500";
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(400, 50);
+        ctx.lineTo(400, 350);
+        ctx.stroke();
+
+        // Draw current direction
+        const currentDir = state.currentDirection;
+        ctx.strokeStyle = "#ffff00";
+        ctx.lineWidth = 3;
+
+        for (let i = 100; i < 300; i += 60) {
+          ctx.beginPath();
+          if (currentDir > 0) {
+            ctx.moveTo(400, i - 15);
+            ctx.lineTo(400, i + 15);
+            ctx.moveTo(395, i + 10);
+            ctx.lineTo(400, i + 15);
+            ctx.lineTo(405, i + 10);
+          } else {
+            ctx.moveTo(400, i + 15);
+            ctx.lineTo(400, i - 15);
+            ctx.moveTo(395, i - 10);
+            ctx.lineTo(400, i - 15);
+            ctx.lineTo(405, i - 10);
+          }
+          ctx.stroke();
+        }
+
+        // Draw hand if enabled
+        if (state.showHand) {
+          ctx.save();
+          ctx.translate(400, 200);
+
+          // Thumb (pointing in current direction)
+          ctx.fillStyle = "#ffdbac";
+          ctx.fillRect(-5, currentDir > 0 ? -30 : 10, 10, 20);
+
+          // Fingers curled around
+          ctx.strokeStyle = "#ffdbac";
+          ctx.lineWidth = 6;
+          for (let i = 0; i < 4; i++) {
+            const angle = (i / 4) * Math.PI * 2 * currentDir;
+            const radius = 40;
+            ctx.beginPath();
+            ctx.arc(0, 0, radius, angle, angle + Math.PI / 3);
+            ctx.stroke();
+          }
+
+          ctx.restore();
+        }
+
+        // Draw magnetic field circles
+        ctx.strokeStyle =
+          currentDir > 0 ? "rgba(0, 255, 255, 0.7)" : "rgba(255, 0, 255, 0.7)";
+        ctx.lineWidth = 2;
+
+        for (let radius = 60; radius <= 180; radius += 40) {
+          ctx.beginPath();
+          ctx.arc(400, 200, radius, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Draw direction arrows
+          const arrowAngle =
+            currentDir > 0 ? Date.now() * 0.002 : -Date.now() * 0.002;
+          const arrowX = 400 + Math.cos(arrowAngle) * radius;
+          const arrowY = 200 + Math.sin(arrowAngle) * radius;
+
+          ctx.save();
+          ctx.translate(arrowX, arrowY);
+          ctx.rotate(arrowAngle + Math.PI / 2);
+          ctx.beginPath();
+          ctx.moveTo(0, -8);
+          ctx.lineTo(-4, 4);
+          ctx.lineTo(4, 4);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      // Coil Animation
+      function animateCoil() {
+        const ctx = contexts[3];
+        const state = experimentStates[3];
+
+        ctx.clearRect(0, 0, 800, 400);
+
+        // Draw coil
+        const centerX = 400,
+          centerY = 200;
+        const coilRadius = 80;
+
+        ctx.strokeStyle = "#ffa500";
+        ctx.lineWidth = 4;
+
+        for (let i = 0; i < state.turns; i++) {
+          const y = centerY - (state.turns * 10) / 2 + i * 10;
+          ctx.beginPath();
+          ctx.arc(centerX, y, coilRadius, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Draw current flow
+        if (state.currentOn) {
+          ctx.strokeStyle = "#ffff00";
+          ctx.lineWidth = 2;
+
+          for (let i = 0; i < state.turns; i++) {
+            const y = centerY - (state.turns * 10) / 2 + i * 10;
+            const phase = Date.now() * 0.005 + i * 0.5;
+            const arrowAngle = phase;
+            const arrowX = centerX + Math.cos(arrowAngle) * coilRadius;
+            const arrowY = y + Math.sin(arrowAngle) * 15;
+
+            ctx.save();
+            ctx.translate(arrowX, arrowY);
+            ctx.rotate(arrowAngle + Math.PI / 2);
+            ctx.beginPath();
+            ctx.moveTo(0, -5);
+            ctx.lineTo(-3, 3);
+            ctx.lineTo(3, 3);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+          }
+
+          // Draw magnetic field lines
+          ctx.strokeStyle = "rgba(0, 255, 255, 0.6)";
+          ctx.lineWidth = 2;
+
+          // Field lines through center
+          for (let i = -3; i <= 3; i++) {
+            if (i === 0) continue;
+            ctx.beginPath();
+            ctx.moveTo(200, centerY + i * 20);
+            ctx.lineTo(600, centerY + i * 20);
+            ctx.stroke();
+
+            // Arrows
+            ctx.beginPath();
+            ctx.moveTo(580, centerY + i * 20 - 5);
+            ctx.lineTo(590, centerY + i * 20);
+            ctx.lineTo(580, centerY + i * 20 + 5);
+            ctx.stroke();
+          }
+
+          // External field lines
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, 150, Math.PI, 0, false);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, 150, 0, Math.PI, false);
+          ctx.stroke();
+        }
+      }
+
+      // Solenoid Animation
+      function animateSolenoid() {
+        const ctx = contexts[4];
+        const state = experimentStates[4];
+
+        ctx.clearRect(0, 0, 800, 400);
+
+        // Draw solenoid coils
+        const solenoidX = 400,
+          solenoidY = 200;
+        const coilWidth = 200,
+          coilHeight = 100;
+
+        // Iron core
+        if (state.hasCore) {
+          ctx.fillStyle = "#666";
+          ctx.fillRect(solenoidX - coilWidth / 2, solenoidY - 8, coilWidth, 16);
+        }
+
+        // Coil windings
+        ctx.strokeStyle = "#ffa500";
+        ctx.lineWidth = 3;
+
+        for (let i = 0; i < 12; i++) {
+          const x = solenoidX - coilWidth / 2 + (i / 11) * coilWidth;
+          ctx.beginPath();
+          ctx.arc(x, solenoidY - 25, 25, 0, Math.PI);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(x, solenoidY + 25, 25, Math.PI, 0);
+          ctx.stroke();
+        }
+
+        // Current flow indicators
+        if (state.currentOn) {
+          ctx.fillStyle = "#ffff00";
+          const phase = Date.now() * 0.003;
+
+          for (let i = 0; i < 12; i++) {
+            const x = solenoidX - coilWidth / 2 + (i / 11) * coilWidth;
+            const arrowY = solenoidY - 25 + Math.sin(phase + i * 0.3) * 20;
+
+            ctx.save();
+            ctx.translate(x, arrowY);
+            ctx.beginPath();
+            ctx.arc(0, 0, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+
+          // Magnetic field lines
+          ctx.strokeStyle = "rgba(0, 255, 255, 0.8)";
+          ctx.lineWidth = 2;
+
+          // Internal field (uniform)
+          for (let i = -2; i <= 2; i++) {
+            if (i === 0) continue;
+            ctx.beginPath();
+            ctx.moveTo(solenoidX - coilWidth / 2 + 20, solenoidY + i * 15);
+            ctx.lineTo(solenoidX + coilWidth / 2 - 20, solenoidY + i * 15);
+            ctx.stroke();
+
+            // Direction arrows
+            ctx.beginPath();
+            ctx.moveTo(solenoidX + coilWidth / 2 - 30, solenoidY + i * 15 - 4);
+            ctx.lineTo(solenoidX + coilWidth / 2 - 20, solenoidY + i * 15);
+            ctx.lineTo(solenoidX + coilWidth / 2 - 30, solenoidY + i * 15 + 4);
+            ctx.stroke();
+          }
+
+          // External field lines
+          for (let i = 0; i < 5; i++) {
+            const offset = (i - 2) * 20;
+            ctx.beginPath();
+            ctx.moveTo(solenoidX - coilWidth / 2, solenoidY + offset);
+            ctx.quadraticCurveTo(
+              solenoidX - coilWidth / 2 - 100,
+              solenoidY + offset - 80,
+              solenoidX + coilWidth / 2,
+              solenoidY + offset
+            );
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(solenoidX + coilWidth / 2, solenoidY - offset);
+            ctx.quadraticCurveTo(
+              solenoidX + coilWidth / 2 + 100,
+              solenoidY - offset + 80,
+              solenoidX - coilWidth / 2,
+              solenoidY - offset
+            );
+            ctx.stroke();
+          }
+        }
+
+        // Labels
+        ctx.fillStyle = "#fff";
+        ctx.font = "14px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          state.hasCore ? "Solenoid with Iron Core" : "Air-Core Solenoid",
+          solenoidX,
+          50
+        );
+      }
+
+      // Fleming's Left Hand Rule Animation
+      function animateFleming() {
+        const ctx = contexts[5];
+        const state = experimentStates[5];
+
+        ctx.clearRect(0, 0, 800, 400);
+
+        // Draw magnetic field (horizontal)
+        ctx.strokeStyle = state.fieldDirection > 0 ? "#ff4444" : "#4444ff";
+        ctx.lineWidth = 3;
+
+        for (let y = 120; y <= 280; y += 40) {
+          ctx.beginPath();
+          if (state.fieldDirection > 0) {
+            ctx.moveTo(100, y);
+            ctx.lineTo(700, y);
+            // Arrows
+            ctx.moveTo(680, y - 8);
+            ctx.lineTo(700, y);
+            ctx.lineTo(680, y + 8);
+          } else {
+            ctx.moveTo(700, y);
+            ctx.lineTo(100, y);
+            // Arrows
+            ctx.moveTo(120, y - 8);
+            ctx.lineTo(100, y);
+            ctx.lineTo(120, y + 8);
+          }
+          ctx.stroke();
+        }
+
+        // Draw conductor (vertical wire)
+        const conductorX = 400;
+        ctx.strokeStyle = "#ffa500";
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(conductorX, 100);
+        ctx.lineTo(conductorX, 300);
+        ctx.stroke();
+
+        // Draw current direction
+        ctx.strokeStyle = "#ffff00";
+        ctx.lineWidth = 3;
+
+        for (let y = 140; y <= 260; y += 40) {
+          ctx.beginPath();
+          if (state.currentDirection > 0) {
+            ctx.moveTo(conductorX, y - 15);
+            ctx.lineTo(conductorX, y + 15);
+            ctx.moveTo(conductorX - 5, y + 10);
+            ctx.lineTo(conductorX, y + 15);
+            ctx.lineTo(conductorX + 5, y + 10);
+          } else {
+            ctx.moveTo(conductorX, y + 15);
+            ctx.lineTo(conductorX, y - 15);
+            ctx.moveTo(conductorX - 5, y - 10);
+            ctx.lineTo(conductorX, y - 15);
+            ctx.lineTo(conductorX + 5, y - 10);
+          }
+          ctx.stroke();
+        }
+
+        // Draw force direction
+        const forceDirection = state.currentDirection * state.fieldDirection;
+        ctx.strokeStyle = "#00ff00";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        if (forceDirection > 0) {
+          ctx.moveTo(conductorX - 40, 200);
+          ctx.lineTo(conductorX - 20, 200);
+          ctx.moveTo(conductorX - 25, 195);
+          ctx.lineTo(conductorX - 20, 200);
+          ctx.lineTo(conductorX - 25, 205);
+        } else {
+          ctx.moveTo(conductorX + 20, 200);
+          ctx.lineTo(conductorX + 40, 200);
+          ctx.moveTo(conductorX + 35, 195);
+          ctx.lineTo(conductorX + 40, 200);
+          ctx.lineTo(conductorX + 35, 205);
+        }
+        ctx.stroke();
+
+        // Draw Fleming's left hand representation
+        ctx.save();
+        ctx.translate(150, 100);
+        ctx.fillStyle = "#ffdbac";
+
+        // Palm
+        ctx.fillRect(0, 0, 60, 80);
+
+        // Fingers (Field direction)
+        ctx.fillStyle = state.fieldDirection > 0 ? "#ff4444" : "#4444ff";
+        ctx.fillRect(60, 10, 40, 8);
+        ctx.fillRect(60, 25, 40, 8);
+        ctx.fillRect(60, 40, 40, 8);
+
+        // Thumb (Force direction)
+        ctx.fillStyle = "#00ff00";
+        if (forceDirection > 0) {
+          ctx.fillRect(-20, 30, 20, 12);
+        } else {
+          ctx.fillRect(60, 30, 20, 12);
+        }
+
+        // Middle finger (Current direction)
+        ctx.fillStyle = "#ffff00";
+        if (state.currentDirection > 0) {
+          ctx.fillRect(25, -20, 8, 20);
+        } else {
+          ctx.fillRect(25, 80, 8, 20);
+        }
+
+        ctx.restore();
+
+        // Labels
+        ctx.fillStyle = "#fff";
+        ctx.font = "16px Arial";
+        ctx.textAlign = "left";
+        ctx.fillText("Thumb = Force", 50, 350);
+        ctx.fillText("First Finger = Field", 200, 350);
+        ctx.fillText("Middle Finger = Current", 350, 350);
+      }
+
+      // Barlow's Wheel Animation
+      function animateBarlow() {
+        const ctx = contexts[6];
+        const state = experimentStates[6];
+
+        ctx.clearRect(0, 0, 800, 400);
+
+        // Draw magnetic field (vertical)
+        ctx.strokeStyle = "#ff4444";
+        ctx.lineWidth = 2;
+
+        for (let x = 150; x <= 650; x += 50) {
+          ctx.beginPath();
+          ctx.moveTo(x, 100);
+          ctx.lineTo(x, 300);
+          // Field direction arrows
+          ctx.moveTo(x - 4, 120);
+          ctx.lineTo(x, 100);
+          ctx.lineTo(x + 4, 120);
+          ctx.stroke();
+        }
+
+        // Draw wheel
+        const wheelX = 400,
+          wheelY = 200,
+          wheelRadius = 60;
+
+        // Wheel rim
+        ctx.strokeStyle = "#888";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(wheelX, wheelY, wheelRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Spokes and current paths
+        ctx.save();
+        ctx.translate(wheelX, wheelY);
+        ctx.rotate(state.angle);
+
+        const numSpokes = 8;
+        for (let i = 0; i < numSpokes; i++) {
+          const angle = (i / numSpokes) * Math.PI * 2;
+          const spokeX = Math.cos(angle) * wheelRadius;
+          const spokeY = Math.sin(angle) * wheelRadius;
+
+          // Spoke
+          ctx.strokeStyle = "#aaa";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(spokeX, spokeY);
+          ctx.stroke();
+
+          // Current flow (if motor is on)
+          if (state.motorOn) {
+            ctx.strokeStyle = "#ffff00";
+            ctx.lineWidth = 3;
+
+            // Current from center to rim
+            const currentPhase = Date.now() * 0.01;
+            const currentPos = (Math.sin(currentPhase + i * 0.5) + 1) / 2;
+            const currentX = spokeX * currentPos;
+            const currentY = spokeY * currentPos;
+
+            ctx.beginPath();
+            ctx.arc(currentX, currentY, 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        ctx.restore();
+
+        // Draw axle and support
+        ctx.fillStyle = "#666";
+        ctx.fillRect(wheelX - 5, wheelY - 5, 10, 10);
+
+        // Support post
+        ctx.fillRect(wheelX - 3, wheelY, 6, 100);
+
+        // Base
+        ctx.fillRect(wheelX - 30, 300, 60, 20);
+
+        // Current source connections
+        ctx.strokeStyle = "#ffa500";
+        ctx.lineWidth = 4;
+
+        // Connection to center (positive)
+        ctx.beginPath();
+        ctx.moveTo(wheelX, wheelY);
+        ctx.lineTo(wheelX, 320);
+        ctx.stroke();
+
+        // Connection to rim (negative) - via mercury contact
+        ctx.beginPath();
+        ctx.moveTo(wheelX + wheelRadius, wheelY);
+        ctx.lineTo(wheelX + wheelRadius + 30, wheelY);
+        ctx.lineTo(wheelX + wheelRadius + 30, 320);
+        ctx.stroke();
+
+        // Mercury trough
+        ctx.fillStyle = "#c0c0c0";
+        ctx.beginPath();
+        ctx.arc(wheelX, wheelY, wheelRadius + 10, Math.PI * 1.3, Math.PI * 1.7);
+        ctx.lineWidth = 6;
+        ctx.stroke();
+
+        // Update rotation if motor is running
+        if (state.motorOn) {
+          state.angle += state.speed * state.direction * 0.02;
+        }
+
+        // Labels
+        ctx.fillStyle = "#fff";
+        ctx.font = "14px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Barlow's Wheel", wheelX, 50);
+        ctx.fillText("Magnetic Field (into page)", wheelX, 370);
+
+        ctx.textAlign = "left";
+        ctx.fillText("Current flows radially", 50, 50);
+        ctx.fillText("Force causes rotation", 50, 70);
+      }
+
+      // Control functions
+      function toggleCurrent(experiment) {
+        const state = experimentStates[experiment];
+        if (experiment === 0 || experiment === 3 || experiment === 4) {
+          state.currentOn = !state.currentOn;
+        } else if (experiment === 1 || experiment === 2) {
+          state.currentDirection *= -1;
+        } else if (experiment === 5) {
+          state.currentDirection *= -1;
+        } else if (experiment === 6) {
+          state.motorOn = !state.motorOn;
+        }
+      }
+
+      function updateCurrent(experiment, value) {
+        experimentStates[experiment].current = parseFloat(value) / 10;
+        document.getElementById(`current-${experiment}`).textContent =
+          (parseFloat(value) / 10).toFixed(1) + "A";
+      }
+
+      function toggleSwimmer() {
+        experimentStates[1].showSwimmer = !experimentStates[1].showSwimmer;
+      }
+
+      function toggleHand() {
+        experimentStates[2].showHand = !experimentStates[2].showHand;
+      }
+
+      function updateTurns(value) {
+        experimentStates[3].turns = parseInt(value);
+        document.getElementById("turns").textContent = value;
+      }
+
+      function addCore() {
+        experimentStates[4].hasCore = !experimentStates[4].hasCore;
+      }
+
+      function toggleField() {
+        experimentStates[5].fieldDirection *= -1;
+      }
+
+      function reverseRotation() {
+        experimentStates[6].direction *= -1;
+      }
+
+      function updateSpeed(value) {
+        experimentStates[6].speed = parseInt(value);
+        document.getElementById("speed").textContent = value;
+      }
+
+      // Animation loop
+      function startAnimations() {
+        function animate() {
+          animateOersted();
+          animateAmpere();
+          animateRightHand();
+          animateCoil();
+          animateSolenoid();
+          animateFleming();
+          animateBarlow();
+
+          requestAnimationFrame(animate);
+        }
+        animate();
+      }
+
+      // Initialize when page loads
+      window.addEventListener("load", initCanvases);
+    </script>
+  </body>
+</html>
